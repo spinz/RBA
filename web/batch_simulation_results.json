@@ -1,0 +1,2690 @@
+[
+  {
+    "level_num": 1,
+    "name": "Lilypad Lagoon",
+    "audit": {
+      "level_name": "Lilypad Lagoon",
+      "total_jumps_audited": 11,
+      "average_difficulty_score": 1.46,
+      "unfair_jumps_flagged": 0,
+      "tight_execution_jumps": 0,
+      "blind_leap_risks": 0,
+      "jumps": [
+        {
+          "jump_index": 2,
+          "from_node": "Platform 'ground' (120px wide)",
+          "to_node": "Floating Lilypad",
+          "gap_x": 70,
+          "gap_y": 72,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 70,
+            "dy": 72,
+            "max_rise": -96.8,
+            "flight_time": 1.021,
+            "apex_time": 0.44,
+            "req_speed": 68.6,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": false
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "TIGHT_EXECUTION": 0.21,
+            "FAIR_CHALLENGE": 0.77,
+            "UNFAIR": 0.0,
+            "COMFORTABLE": 0.02
+          },
+          "difficulty_score": 1.72,
+          "blind_leap_risk": 0.17,
+          "pacing_rhythm": "TENSION_BUILD"
+        },
+        {
+          "jump_index": 3,
+          "from_node": "Floating Lilypad",
+          "to_node": "Platform 'ground' (220px wide)",
+          "gap_x": 14,
+          "gap_y": -32,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 14,
+            "dy": -32,
+            "max_rise": -96.8,
+            "flight_time": 0.8,
+            "apex_time": 0.44,
+            "req_speed": 17.5,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": false
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "UNFAIR": 0.0,
+            "COMFORTABLE": 0.33,
+            "FAIR_CHALLENGE": 0.53,
+            "TIGHT_EXECUTION": 0.14
+          },
+          "difficulty_score": 1.19,
+          "blind_leap_risk": 0.14,
+          "pacing_rhythm": "BREATHER"
+        },
+        {
+          "jump_index": 7,
+          "from_node": "Floating Lilypad",
+          "to_node": "Floating Lilypad",
+          "gap_x": 29,
+          "gap_y": -4,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 29,
+            "dy": -4,
+            "max_rise": -96.8,
+            "flight_time": 0.871,
+            "apex_time": 0.44,
+            "req_speed": 33.3,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": false
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "TIGHT_EXECUTION": 0.2,
+            "COMFORTABLE": 0.09,
+            "FAIR_CHALLENGE": 0.7,
+            "UNFAIR": 0.01
+          },
+          "difficulty_score": 1.49,
+          "blind_leap_risk": 0.18,
+          "pacing_rhythm": "TENSION_BUILD"
+        },
+        {
+          "jump_index": 8,
+          "from_node": "Floating Lilypad",
+          "to_node": "Platform 'ground' (320px wide)",
+          "gap_x": 19,
+          "gap_y": -8,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 19,
+            "dy": -8,
+            "max_rise": -96.8,
+            "flight_time": 0.861,
+            "apex_time": 0.44,
+            "req_speed": 22.1,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": false
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "FAIR_CHALLENGE": 0.55,
+            "COMFORTABLE": 0.27,
+            "TIGHT_EXECUTION": 0.18,
+            "UNFAIR": 0.0
+          },
+          "difficulty_score": 1.27,
+          "blind_leap_risk": 0.13,
+          "pacing_rhythm": "BREATHER"
+        },
+        {
+          "jump_index": 10,
+          "from_node": "Platform 'ground' (100px wide)",
+          "to_node": "Floating Lilypad",
+          "gap_x": 50,
+          "gap_y": 92,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 50,
+            "dy": 92,
+            "max_rise": -204.8,
+            "flight_time": 1.41,
+            "apex_time": 0.64,
+            "req_speed": 35.4,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": true
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "FAIR_CHALLENGE": 0.83,
+            "COMFORTABLE": 0.05,
+            "TIGHT_EXECUTION": 0.12,
+            "UNFAIR": 0.0
+          },
+          "difficulty_score": 1.75,
+          "blind_leap_risk": 0.18,
+          "pacing_rhythm": "TENSION_BUILD"
+        },
+        {
+          "jump_index": 11,
+          "from_node": "Floating Lilypad",
+          "to_node": "Platform 'grass' (160px wide)",
+          "gap_x": 14,
+          "gap_y": -132,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 14,
+            "dy": -132,
+            "max_rise": -204.8,
+            "flight_time": 1.022,
+            "apex_time": 0.64,
+            "req_speed": 13.7,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": true
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "UNFAIR": 0.01,
+            "COMFORTABLE": 0.16,
+            "TIGHT_EXECUTION": 0.16,
+            "FAIR_CHALLENGE": 0.67
+          },
+          "difficulty_score": 1.52,
+          "blind_leap_risk": 0.15,
+          "pacing_rhythm": "TENSION_BUILD"
+        },
+        {
+          "jump_index": 13,
+          "from_node": "Floating Lilypad",
+          "to_node": "Floating Lilypad",
+          "gap_x": 74,
+          "gap_y": 0,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 74,
+            "dy": 0,
+            "max_rise": -96.8,
+            "flight_time": 0.88,
+            "apex_time": 0.44,
+            "req_speed": 84.1,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": false
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "TIGHT_EXECUTION": 0.17,
+            "UNFAIR": 0.01,
+            "COMFORTABLE": 0.07,
+            "FAIR_CHALLENGE": 0.75
+          },
+          "difficulty_score": 1.39,
+          "blind_leap_risk": 0.18,
+          "pacing_rhythm": "TENSION_BUILD"
+        },
+        {
+          "jump_index": 14,
+          "from_node": "Floating Lilypad",
+          "to_node": "Platform 'ground' (260px wide)",
+          "gap_x": 34,
+          "gap_y": -32,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 34,
+            "dy": -32,
+            "max_rise": -96.8,
+            "flight_time": 0.8,
+            "apex_time": 0.44,
+            "req_speed": 42.5,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": false
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "FAIR_CHALLENGE": 0.59,
+            "UNFAIR": 0.0,
+            "TIGHT_EXECUTION": 0.14,
+            "COMFORTABLE": 0.27
+          },
+          "difficulty_score": 1.37,
+          "blind_leap_risk": 0.14,
+          "pacing_rhythm": "BREATHER"
+        },
+        {
+          "jump_index": 15,
+          "from_node": "Platform 'ground' (260px wide)",
+          "to_node": "Floating Lilypad",
+          "gap_x": 60,
+          "gap_y": 32,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 60,
+            "dy": 32,
+            "max_rise": -96.8,
+            "flight_time": 0.948,
+            "apex_time": 0.44,
+            "req_speed": 63.3,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": false
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "COMFORTABLE": 0.03,
+            "UNFAIR": 0.0,
+            "TIGHT_EXECUTION": 0.24,
+            "FAIR_CHALLENGE": 0.73
+          },
+          "difficulty_score": 1.67,
+          "blind_leap_risk": 0.18,
+          "pacing_rhythm": "TENSION_BUILD"
+        },
+        {
+          "jump_index": 16,
+          "from_node": "Floating Lilypad",
+          "to_node": "Floating Lilypad",
+          "gap_x": 34,
+          "gap_y": -4,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 34,
+            "dy": -4,
+            "max_rise": -96.8,
+            "flight_time": 0.871,
+            "apex_time": 0.44,
+            "req_speed": 39.0,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": false
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "UNFAIR": 0.0,
+            "FAIR_CHALLENGE": 0.66,
+            "COMFORTABLE": 0.05,
+            "TIGHT_EXECUTION": 0.29
+          },
+          "difficulty_score": 1.56,
+          "blind_leap_risk": 0.19,
+          "pacing_rhythm": "TENSION_BUILD"
+        },
+        {
+          "jump_index": 17,
+          "from_node": "Floating Lilypad",
+          "to_node": "Platform 'ground' (500px wide)",
+          "gap_x": 14,
+          "gap_y": -28,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 14,
+            "dy": -28,
+            "max_rise": -96.8,
+            "flight_time": 0.811,
+            "apex_time": 0.44,
+            "req_speed": 17.3,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": false
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "COMFORTABLE": 0.34,
+            "TIGHT_EXECUTION": 0.15,
+            "FAIR_CHALLENGE": 0.51,
+            "UNFAIR": 0.0
+          },
+          "difficulty_score": 1.17,
+          "blind_leap_risk": 0.12,
+          "pacing_rhythm": "BREATHER"
+        }
+      ]
+    },
+    "sim_casual": {
+      "level_name": "Lilypad Lagoon",
+      "skill_profile": "Casual (Standard Platformer Fan)",
+      "total_simulated_runs": 150,
+      "flawless_runs": 1,
+      "clear_rate_percent": 0.7,
+      "total_falls": 503,
+      "avg_falls_per_run": 3.35,
+      "choke_point_heatmap": [
+        {
+          "jump_index": 2,
+          "label": "Platform 'ground' (120px wide) -> Floating Lilypad",
+          "difficulty": 1.72,
+          "falls_count": 59,
+          "fall_rate_percent": 39.3
+        },
+        {
+          "jump_index": 3,
+          "label": "Floating Lilypad -> Platform 'ground' (220px wide)",
+          "difficulty": 1.19,
+          "falls_count": 44,
+          "fall_rate_percent": 29.3
+        },
+        {
+          "jump_index": 7,
+          "label": "Floating Lilypad -> Floating Lilypad",
+          "difficulty": 1.49,
+          "falls_count": 45,
+          "fall_rate_percent": 30.0
+        },
+        {
+          "jump_index": 8,
+          "label": "Floating Lilypad -> Platform 'ground' (320px wide)",
+          "difficulty": 1.27,
+          "falls_count": 38,
+          "fall_rate_percent": 25.3
+        },
+        {
+          "jump_index": 10,
+          "label": "Platform 'ground' (100px wide) -> Floating Lilypad",
+          "difficulty": 1.75,
+          "falls_count": 42,
+          "fall_rate_percent": 28.0
+        },
+        {
+          "jump_index": 11,
+          "label": "Floating Lilypad -> Platform 'grass' (160px wide)",
+          "difficulty": 1.52,
+          "falls_count": 54,
+          "fall_rate_percent": 36.0
+        },
+        {
+          "jump_index": 13,
+          "label": "Floating Lilypad -> Floating Lilypad",
+          "difficulty": 1.39,
+          "falls_count": 43,
+          "fall_rate_percent": 28.7
+        },
+        {
+          "jump_index": 14,
+          "label": "Floating Lilypad -> Platform 'ground' (260px wide)",
+          "difficulty": 1.37,
+          "falls_count": 40,
+          "fall_rate_percent": 26.7
+        },
+        {
+          "jump_index": 15,
+          "label": "Platform 'ground' (260px wide) -> Floating Lilypad",
+          "difficulty": 1.67,
+          "falls_count": 48,
+          "fall_rate_percent": 32.0
+        },
+        {
+          "jump_index": 16,
+          "label": "Floating Lilypad -> Floating Lilypad",
+          "difficulty": 1.56,
+          "falls_count": 52,
+          "fall_rate_percent": 34.7
+        },
+        {
+          "jump_index": 17,
+          "label": "Floating Lilypad -> Platform 'ground' (500px wide)",
+          "difficulty": 1.17,
+          "falls_count": 38,
+          "fall_rate_percent": 25.3
+        }
+      ]
+    },
+    "sim_pro": {
+      "level_name": "Lilypad Lagoon",
+      "skill_profile": "Speedrunner / Veteran",
+      "total_simulated_runs": 150,
+      "flawless_runs": 13,
+      "clear_rate_percent": 8.7,
+      "total_falls": 333,
+      "avg_falls_per_run": 2.22,
+      "choke_point_heatmap": [
+        {
+          "jump_index": 2,
+          "label": "Platform 'ground' (120px wide) -> Floating Lilypad",
+          "difficulty": 1.72,
+          "falls_count": 33,
+          "fall_rate_percent": 22.0
+        },
+        {
+          "jump_index": 3,
+          "label": "Floating Lilypad -> Platform 'ground' (220px wide)",
+          "difficulty": 1.19,
+          "falls_count": 24,
+          "fall_rate_percent": 16.0
+        },
+        {
+          "jump_index": 7,
+          "label": "Floating Lilypad -> Floating Lilypad",
+          "difficulty": 1.49,
+          "falls_count": 26,
+          "fall_rate_percent": 17.3
+        },
+        {
+          "jump_index": 8,
+          "label": "Floating Lilypad -> Platform 'ground' (320px wide)",
+          "difficulty": 1.27,
+          "falls_count": 27,
+          "fall_rate_percent": 18.0
+        },
+        {
+          "jump_index": 10,
+          "label": "Platform 'ground' (100px wide) -> Floating Lilypad",
+          "difficulty": 1.75,
+          "falls_count": 32,
+          "fall_rate_percent": 21.3
+        },
+        {
+          "jump_index": 11,
+          "label": "Floating Lilypad -> Platform 'grass' (160px wide)",
+          "difficulty": 1.52,
+          "falls_count": 32,
+          "fall_rate_percent": 21.3
+        },
+        {
+          "jump_index": 13,
+          "label": "Floating Lilypad -> Floating Lilypad",
+          "difficulty": 1.39,
+          "falls_count": 30,
+          "fall_rate_percent": 20.0
+        },
+        {
+          "jump_index": 14,
+          "label": "Floating Lilypad -> Platform 'ground' (260px wide)",
+          "difficulty": 1.37,
+          "falls_count": 33,
+          "fall_rate_percent": 22.0
+        },
+        {
+          "jump_index": 15,
+          "label": "Platform 'ground' (260px wide) -> Floating Lilypad",
+          "difficulty": 1.67,
+          "falls_count": 39,
+          "fall_rate_percent": 26.0
+        },
+        {
+          "jump_index": 16,
+          "label": "Floating Lilypad -> Floating Lilypad",
+          "difficulty": 1.56,
+          "falls_count": 33,
+          "fall_rate_percent": 22.0
+        },
+        {
+          "jump_index": 17,
+          "label": "Floating Lilypad -> Platform 'ground' (500px wide)",
+          "difficulty": 1.17,
+          "falls_count": 24,
+          "fall_rate_percent": 16.0
+        }
+      ]
+    }
+  },
+  {
+    "level_num": 2,
+    "name": "Cattail Canopy",
+    "audit": {
+      "level_name": "Cattail Canopy",
+      "total_jumps_audited": 12,
+      "average_difficulty_score": 1.82,
+      "unfair_jumps_flagged": 0,
+      "tight_execution_jumps": 2,
+      "blind_leap_risks": 0,
+      "jumps": [
+        {
+          "jump_index": 1,
+          "from_node": "Platform 'ground' (380px wide)",
+          "to_node": "Floating Lilypad",
+          "gap_x": 30,
+          "gap_y": 12,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 30,
+            "dy": 12,
+            "max_rise": -96.8,
+            "flight_time": 0.906,
+            "apex_time": 0.44,
+            "req_speed": 33.1,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": false
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "FAIR_CHALLENGE": 0.7,
+            "COMFORTABLE": 0.12,
+            "TIGHT_EXECUTION": 0.18,
+            "UNFAIR": 0.0
+          },
+          "difficulty_score": 1.33,
+          "blind_leap_risk": 0.14,
+          "pacing_rhythm": "TENSION_BUILD"
+        },
+        {
+          "jump_index": 3,
+          "from_node": "Platform 'ground' (140px wide)",
+          "to_node": "Floating Lilypad",
+          "gap_x": 35,
+          "gap_y": 92,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 35,
+            "dy": 92,
+            "max_rise": -96.8,
+            "flight_time": 1.054,
+            "apex_time": 0.44,
+            "req_speed": 33.2,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": false
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "UNFAIR": 0.01,
+            "COMFORTABLE": 0.01,
+            "FAIR_CHALLENGE": 0.64,
+            "TIGHT_EXECUTION": 0.34
+          },
+          "difficulty_score": 1.93,
+          "blind_leap_risk": 0.21,
+          "pacing_rhythm": "TENSION_BUILD"
+        },
+        {
+          "jump_index": 5,
+          "from_node": "Platform 'ground' (140px wide)",
+          "to_node": "Floating Lilypad",
+          "gap_x": 35,
+          "gap_y": 172,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 35,
+            "dy": 172,
+            "max_rise": -204.8,
+            "flight_time": 1.508,
+            "apex_time": 0.64,
+            "req_speed": 23.2,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": true
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "UNFAIR": 0.0,
+            "FAIR_CHALLENGE": 0.8,
+            "COMFORTABLE": 0.02,
+            "TIGHT_EXECUTION": 0.18
+          },
+          "difficulty_score": 1.86,
+          "blind_leap_risk": 0.19,
+          "pacing_rhythm": "TENSION_BUILD"
+        },
+        {
+          "jump_index": 7,
+          "from_node": "Platform 'grass' (180px wide)",
+          "to_node": "Platform 'grass' (150px wide)",
+          "gap_x": 60,
+          "gap_y": -70,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 60,
+            "dy": -70,
+            "max_rise": -96.8,
+            "flight_time": 0.672,
+            "apex_time": 0.44,
+            "req_speed": 89.3,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": false
+          },
+          "fairness": "TIGHT_EXECUTION",
+          "fairness_probs": {
+            "FAIR_CHALLENGE": 0.49,
+            "COMFORTABLE": 0.01,
+            "UNFAIR": 0.01,
+            "TIGHT_EXECUTION": 0.49
+          },
+          "difficulty_score": 1.96,
+          "blind_leap_risk": 0.19,
+          "pacing_rhythm": "TENSION_BUILD"
+        },
+        {
+          "jump_index": 8,
+          "from_node": "Platform 'grass' (150px wide)",
+          "to_node": "Floating Lilypad",
+          "gap_x": 30,
+          "gap_y": 312,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 30,
+            "dy": 312,
+            "max_rise": -96.8,
+            "flight_time": 1.344,
+            "apex_time": 0.44,
+            "req_speed": 22.3,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": false
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "COMFORTABLE": 0.01,
+            "TIGHT_EXECUTION": 0.27,
+            "FAIR_CHALLENGE": 0.71,
+            "UNFAIR": 0.01
+          },
+          "difficulty_score": 1.88,
+          "blind_leap_risk": 0.24,
+          "pacing_rhythm": "TENSION_BUILD"
+        },
+        {
+          "jump_index": 10,
+          "from_node": "Platform 'ground' (320px wide)",
+          "to_node": "Floating Lilypad",
+          "gap_x": 40,
+          "gap_y": 42,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 40,
+            "dy": 42,
+            "max_rise": -204.8,
+            "flight_time": 1.343,
+            "apex_time": 0.64,
+            "req_speed": 29.8,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": true
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "FAIR_CHALLENGE": 0.69,
+            "TIGHT_EXECUTION": 0.29,
+            "COMFORTABLE": 0.02,
+            "UNFAIR": 0.0
+          },
+          "difficulty_score": 1.84,
+          "blind_leap_risk": 0.16,
+          "pacing_rhythm": "TENSION_BUILD"
+        },
+        {
+          "jump_index": 12,
+          "from_node": "Platform 'grass' (120px wide)",
+          "to_node": "Floating Lilypad",
+          "gap_x": 30,
+          "gap_y": 122,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 30,
+            "dy": 122,
+            "max_rise": -96.8,
+            "flight_time": 1.102,
+            "apex_time": 0.44,
+            "req_speed": 27.2,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": false
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "FAIR_CHALLENGE": 0.72,
+            "COMFORTABLE": 0.01,
+            "TIGHT_EXECUTION": 0.26,
+            "UNFAIR": 0.01
+          },
+          "difficulty_score": 1.82,
+          "blind_leap_risk": 0.21,
+          "pacing_rhythm": "TENSION_BUILD"
+        },
+        {
+          "jump_index": 14,
+          "from_node": "Platform 'grass' (120px wide)",
+          "to_node": "Floating Lilypad",
+          "gap_x": 30,
+          "gap_y": 212,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 30,
+            "dy": 212,
+            "max_rise": -96.8,
+            "flight_time": 1.226,
+            "apex_time": 0.44,
+            "req_speed": 24.5,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": false
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "UNFAIR": 0.01,
+            "COMFORTABLE": 0.02,
+            "TIGHT_EXECUTION": 0.23,
+            "FAIR_CHALLENGE": 0.74
+          },
+          "difficulty_score": 1.81,
+          "blind_leap_risk": 0.23,
+          "pacing_rhythm": "TENSION_BUILD"
+        },
+        {
+          "jump_index": 16,
+          "from_node": "Platform 'grass' (120px wide)",
+          "to_node": "Platform 'grass' (280px wide)",
+          "gap_x": 80,
+          "gap_y": -60,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 80,
+            "dy": -60,
+            "max_rise": -96.8,
+            "flight_time": 0.711,
+            "apex_time": 0.44,
+            "req_speed": 112.5,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": false
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "TIGHT_EXECUTION": 0.18,
+            "COMFORTABLE": 0.13,
+            "UNFAIR": 0.0,
+            "FAIR_CHALLENGE": 0.69
+          },
+          "difficulty_score": 1.84,
+          "blind_leap_risk": 0.18,
+          "pacing_rhythm": "TENSION_BUILD"
+        },
+        {
+          "jump_index": 17,
+          "from_node": "Platform 'grass' (280px wide)",
+          "to_node": "Platform 'grass' (160px wide)",
+          "gap_x": 50,
+          "gap_y": 110,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 50,
+            "dy": 110,
+            "max_rise": -204.8,
+            "flight_time": 1.433,
+            "apex_time": 0.64,
+            "req_speed": 34.9,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": true
+          },
+          "fairness": "TIGHT_EXECUTION",
+          "fairness_probs": {
+            "TIGHT_EXECUTION": 0.52,
+            "UNFAIR": 0.0,
+            "COMFORTABLE": 0.01,
+            "FAIR_CHALLENGE": 0.47
+          },
+          "difficulty_score": 1.99,
+          "blind_leap_risk": 0.2,
+          "pacing_rhythm": "TENSION_BUILD"
+        },
+        {
+          "jump_index": 18,
+          "from_node": "Platform 'grass' (160px wide)",
+          "to_node": "Platform 'grass' (160px wide)",
+          "gap_x": 50,
+          "gap_y": 100,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 50,
+            "dy": 100,
+            "max_rise": -96.8,
+            "flight_time": 1.067,
+            "apex_time": 0.44,
+            "req_speed": 46.8,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": false
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "COMFORTABLE": 0.02,
+            "FAIR_CHALLENGE": 0.75,
+            "UNFAIR": 0.0,
+            "TIGHT_EXECUTION": 0.23
+          },
+          "difficulty_score": 1.87,
+          "blind_leap_risk": 0.18,
+          "pacing_rhythm": "TENSION_BUILD"
+        },
+        {
+          "jump_index": 19,
+          "from_node": "Platform 'grass' (160px wide)",
+          "to_node": "Floating Lilypad",
+          "gap_x": 25,
+          "gap_y": 152,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 25,
+            "dy": 152,
+            "max_rise": -96.8,
+            "flight_time": 1.145,
+            "apex_time": 0.44,
+            "req_speed": 21.8,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": false
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "FAIR_CHALLENGE": 0.72,
+            "COMFORTABLE": 0.02,
+            "TIGHT_EXECUTION": 0.25,
+            "UNFAIR": 0.01
+          },
+          "difficulty_score": 1.77,
+          "blind_leap_risk": 0.19,
+          "pacing_rhythm": "TENSION_BUILD"
+        }
+      ]
+    },
+    "sim_casual": {
+      "level_name": "Cattail Canopy",
+      "skill_profile": "Casual (Standard Platformer Fan)",
+      "total_simulated_runs": 150,
+      "flawless_runs": 1,
+      "clear_rate_percent": 0.7,
+      "total_falls": 671,
+      "avg_falls_per_run": 4.47,
+      "choke_point_heatmap": [
+        {
+          "jump_index": 1,
+          "label": "Platform 'ground' (380px wide) -> Floating Lilypad",
+          "difficulty": 1.33,
+          "falls_count": 41,
+          "fall_rate_percent": 27.3
+        },
+        {
+          "jump_index": 3,
+          "label": "Platform 'ground' (140px wide) -> Floating Lilypad",
+          "difficulty": 1.93,
+          "falls_count": 58,
+          "fall_rate_percent": 38.7
+        },
+        {
+          "jump_index": 5,
+          "label": "Platform 'ground' (140px wide) -> Floating Lilypad",
+          "difficulty": 1.86,
+          "falls_count": 53,
+          "fall_rate_percent": 35.3
+        },
+        {
+          "jump_index": 7,
+          "label": "Platform 'grass' (180px wide) -> Platform 'grass' (150px wide)",
+          "difficulty": 1.96,
+          "falls_count": 77,
+          "fall_rate_percent": 51.3
+        },
+        {
+          "jump_index": 8,
+          "label": "Platform 'grass' (150px wide) -> Floating Lilypad",
+          "difficulty": 1.88,
+          "falls_count": 51,
+          "fall_rate_percent": 34.0
+        },
+        {
+          "jump_index": 10,
+          "label": "Platform 'ground' (320px wide) -> Floating Lilypad",
+          "difficulty": 1.84,
+          "falls_count": 54,
+          "fall_rate_percent": 36.0
+        },
+        {
+          "jump_index": 12,
+          "label": "Platform 'grass' (120px wide) -> Floating Lilypad",
+          "difficulty": 1.82,
+          "falls_count": 47,
+          "fall_rate_percent": 31.3
+        },
+        {
+          "jump_index": 14,
+          "label": "Platform 'grass' (120px wide) -> Floating Lilypad",
+          "difficulty": 1.81,
+          "falls_count": 44,
+          "fall_rate_percent": 29.3
+        },
+        {
+          "jump_index": 16,
+          "label": "Platform 'grass' (120px wide) -> Platform 'grass' (280px wide)",
+          "difficulty": 1.84,
+          "falls_count": 50,
+          "fall_rate_percent": 33.3
+        },
+        {
+          "jump_index": 17,
+          "label": "Platform 'grass' (280px wide) -> Platform 'grass' (160px wide)",
+          "difficulty": 1.99,
+          "falls_count": 102,
+          "fall_rate_percent": 68.0
+        },
+        {
+          "jump_index": 18,
+          "label": "Platform 'grass' (160px wide) -> Platform 'grass' (160px wide)",
+          "difficulty": 1.87,
+          "falls_count": 47,
+          "fall_rate_percent": 31.3
+        },
+        {
+          "jump_index": 19,
+          "label": "Platform 'grass' (160px wide) -> Floating Lilypad",
+          "difficulty": 1.77,
+          "falls_count": 47,
+          "fall_rate_percent": 31.3
+        }
+      ]
+    },
+    "sim_pro": {
+      "level_name": "Cattail Canopy",
+      "skill_profile": "Speedrunner / Veteran",
+      "total_simulated_runs": 150,
+      "flawless_runs": 4,
+      "clear_rate_percent": 2.7,
+      "total_falls": 484,
+      "avg_falls_per_run": 3.23,
+      "choke_point_heatmap": [
+        {
+          "jump_index": 1,
+          "label": "Platform 'ground' (380px wide) -> Floating Lilypad",
+          "difficulty": 1.33,
+          "falls_count": 33,
+          "fall_rate_percent": 22.0
+        },
+        {
+          "jump_index": 3,
+          "label": "Platform 'ground' (140px wide) -> Floating Lilypad",
+          "difficulty": 1.93,
+          "falls_count": 26,
+          "fall_rate_percent": 17.3
+        },
+        {
+          "jump_index": 5,
+          "label": "Platform 'ground' (140px wide) -> Floating Lilypad",
+          "difficulty": 1.86,
+          "falls_count": 33,
+          "fall_rate_percent": 22.0
+        },
+        {
+          "jump_index": 7,
+          "label": "Platform 'grass' (180px wide) -> Platform 'grass' (150px wide)",
+          "difficulty": 1.96,
+          "falls_count": 52,
+          "fall_rate_percent": 34.7
+        },
+        {
+          "jump_index": 8,
+          "label": "Platform 'grass' (150px wide) -> Floating Lilypad",
+          "difficulty": 1.88,
+          "falls_count": 40,
+          "fall_rate_percent": 26.7
+        },
+        {
+          "jump_index": 10,
+          "label": "Platform 'ground' (320px wide) -> Floating Lilypad",
+          "difficulty": 1.84,
+          "falls_count": 45,
+          "fall_rate_percent": 30.0
+        },
+        {
+          "jump_index": 12,
+          "label": "Platform 'grass' (120px wide) -> Floating Lilypad",
+          "difficulty": 1.82,
+          "falls_count": 32,
+          "fall_rate_percent": 21.3
+        },
+        {
+          "jump_index": 14,
+          "label": "Platform 'grass' (120px wide) -> Floating Lilypad",
+          "difficulty": 1.81,
+          "falls_count": 43,
+          "fall_rate_percent": 28.7
+        },
+        {
+          "jump_index": 16,
+          "label": "Platform 'grass' (120px wide) -> Platform 'grass' (280px wide)",
+          "difficulty": 1.84,
+          "falls_count": 44,
+          "fall_rate_percent": 29.3
+        },
+        {
+          "jump_index": 17,
+          "label": "Platform 'grass' (280px wide) -> Platform 'grass' (160px wide)",
+          "difficulty": 1.99,
+          "falls_count": 51,
+          "fall_rate_percent": 34.0
+        },
+        {
+          "jump_index": 18,
+          "label": "Platform 'grass' (160px wide) -> Platform 'grass' (160px wide)",
+          "difficulty": 1.87,
+          "falls_count": 46,
+          "fall_rate_percent": 30.7
+        },
+        {
+          "jump_index": 19,
+          "label": "Platform 'grass' (160px wide) -> Floating Lilypad",
+          "difficulty": 1.77,
+          "falls_count": 39,
+          "fall_rate_percent": 26.0
+        }
+      ]
+    }
+  },
+  {
+    "level_num": 3,
+    "name": "Mushroom Mire",
+    "audit": {
+      "level_name": "Mushroom Mire",
+      "total_jumps_audited": 14,
+      "average_difficulty_score": 1.62,
+      "unfair_jumps_flagged": 0,
+      "tight_execution_jumps": 1,
+      "blind_leap_risks": 0,
+      "jumps": [
+        {
+          "jump_index": 1,
+          "from_node": "Platform 'ground' (420px wide)",
+          "to_node": "Floating Lilypad",
+          "gap_x": 30,
+          "gap_y": 20,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 30,
+            "dy": 20,
+            "max_rise": -96.8,
+            "flight_time": 0.923,
+            "apex_time": 0.44,
+            "req_speed": 32.5,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": false
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "COMFORTABLE": 0.14,
+            "FAIR_CHALLENGE": 0.69,
+            "TIGHT_EXECUTION": 0.17,
+            "UNFAIR": 0.0
+          },
+          "difficulty_score": 1.39,
+          "blind_leap_risk": 0.14,
+          "pacing_rhythm": "TENSION_BUILD"
+        },
+        {
+          "jump_index": 3,
+          "from_node": "Platform 'ground' (160px wide)",
+          "to_node": "Floating Lilypad",
+          "gap_x": 20,
+          "gap_y": 100,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 20,
+            "dy": 100,
+            "max_rise": -204.8,
+            "flight_time": 1.421,
+            "apex_time": 0.64,
+            "req_speed": 14.1,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": true
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "COMFORTABLE": 0.08,
+            "FAIR_CHALLENGE": 0.81,
+            "UNFAIR": 0.0,
+            "TIGHT_EXECUTION": 0.11
+          },
+          "difficulty_score": 1.5,
+          "blind_leap_risk": 0.15,
+          "pacing_rhythm": "TENSION_BUILD"
+        },
+        {
+          "jump_index": 5,
+          "from_node": "Platform 'grass' (160px wide)",
+          "to_node": "Platform 'grass' (85px wide)",
+          "gap_x": 25,
+          "gap_y": -50,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 25,
+            "dy": -50,
+            "max_rise": -204.8,
+            "flight_time": 1.196,
+            "apex_time": 0.64,
+            "req_speed": 20.9,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": true
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "COMFORTABLE": 0.01,
+            "FAIR_CHALLENGE": 0.62,
+            "TIGHT_EXECUTION": 0.37,
+            "UNFAIR": 0.0
+          },
+          "difficulty_score": 1.62,
+          "blind_leap_risk": 0.16,
+          "pacing_rhythm": "TENSION_BUILD"
+        },
+        {
+          "jump_index": 6,
+          "from_node": "Platform 'grass' (85px wide)",
+          "to_node": "Platform 'grass' (150px wide)",
+          "gap_x": 20,
+          "gap_y": -50,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 20,
+            "dy": -50,
+            "max_rise": -96.8,
+            "flight_time": 0.746,
+            "apex_time": 0.44,
+            "req_speed": 26.8,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": false
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "UNFAIR": 0.0,
+            "COMFORTABLE": 0.1,
+            "FAIR_CHALLENGE": 0.7,
+            "TIGHT_EXECUTION": 0.2
+          },
+          "difficulty_score": 1.8,
+          "blind_leap_risk": 0.18,
+          "pacing_rhythm": "TENSION_BUILD"
+        },
+        {
+          "jump_index": 8,
+          "from_node": "Floating Lilypad",
+          "to_node": "Floating Lilypad",
+          "gap_x": 24,
+          "gap_y": 0,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 24,
+            "dy": 0,
+            "max_rise": -96.8,
+            "flight_time": 0.88,
+            "apex_time": 0.44,
+            "req_speed": 27.3,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": false
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "COMFORTABLE": 0.38,
+            "TIGHT_EXECUTION": 0.08,
+            "FAIR_CHALLENGE": 0.54,
+            "UNFAIR": 0.0
+          },
+          "difficulty_score": 0.93,
+          "blind_leap_risk": 0.11,
+          "pacing_rhythm": "BREATHER"
+        },
+        {
+          "jump_index": 10,
+          "from_node": "Platform 'ground' (360px wide)",
+          "to_node": "Floating Lilypad",
+          "gap_x": 25,
+          "gap_y": 60,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 25,
+            "dy": 60,
+            "max_rise": -204.8,
+            "flight_time": 1.368,
+            "apex_time": 0.64,
+            "req_speed": 18.3,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": true
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "UNFAIR": 0.0,
+            "FAIR_CHALLENGE": 0.76,
+            "TIGHT_EXECUTION": 0.2,
+            "COMFORTABLE": 0.04
+          },
+          "difficulty_score": 1.73,
+          "blind_leap_risk": 0.16,
+          "pacing_rhythm": "TENSION_BUILD"
+        },
+        {
+          "jump_index": 11,
+          "from_node": "Floating Lilypad",
+          "to_node": "Platform 'ground' (120px wide)",
+          "gap_x": 19,
+          "gap_y": -140,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 19,
+            "dy": -140,
+            "max_rise": -204.8,
+            "flight_time": 1.0,
+            "apex_time": 0.64,
+            "req_speed": 19.0,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": true
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "UNFAIR": 0.0,
+            "COMFORTABLE": 0.11,
+            "TIGHT_EXECUTION": 0.18,
+            "FAIR_CHALLENGE": 0.71
+          },
+          "difficulty_score": 1.65,
+          "blind_leap_risk": 0.16,
+          "pacing_rhythm": "TENSION_BUILD"
+        },
+        {
+          "jump_index": 12,
+          "from_node": "Platform 'ground' (120px wide)",
+          "to_node": "Platform 'ground' (120px wide)",
+          "gap_x": 100,
+          "gap_y": -80,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 100,
+            "dy": -80,
+            "max_rise": -96.8,
+            "flight_time": 0.623,
+            "apex_time": 0.44,
+            "req_speed": 160.4,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": false
+          },
+          "fairness": "TIGHT_EXECUTION",
+          "fairness_probs": {
+            "COMFORTABLE": 0.0,
+            "UNFAIR": 0.01,
+            "TIGHT_EXECUTION": 0.53,
+            "FAIR_CHALLENGE": 0.46
+          },
+          "difficulty_score": 2.01,
+          "blind_leap_risk": 0.22,
+          "pacing_rhythm": "TENSION_BUILD"
+        },
+        {
+          "jump_index": 13,
+          "from_node": "Platform 'ground' (120px wide)",
+          "to_node": "Platform 'ground' (140px wide)",
+          "gap_x": 100,
+          "gap_y": -80,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 100,
+            "dy": -80,
+            "max_rise": -96.8,
+            "flight_time": 0.623,
+            "apex_time": 0.44,
+            "req_speed": 160.4,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": false
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "TIGHT_EXECUTION": 0.23,
+            "FAIR_CHALLENGE": 0.75,
+            "COMFORTABLE": 0.02,
+            "UNFAIR": 0.0
+          },
+          "difficulty_score": 1.89,
+          "blind_leap_risk": 0.24,
+          "pacing_rhythm": "TENSION_BUILD"
+        },
+        {
+          "jump_index": 14,
+          "from_node": "Platform 'ground' (140px wide)",
+          "to_node": "Platform 'grass' (220px wide)",
+          "gap_x": 100,
+          "gap_y": -60,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 100,
+            "dy": -60,
+            "max_rise": -96.8,
+            "flight_time": 0.711,
+            "apex_time": 0.44,
+            "req_speed": 140.6,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": false
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "COMFORTABLE": 0.05,
+            "TIGHT_EXECUTION": 0.13,
+            "FAIR_CHALLENGE": 0.81,
+            "UNFAIR": 0.0
+          },
+          "difficulty_score": 1.7,
+          "blind_leap_risk": 0.18,
+          "pacing_rhythm": "TENSION_BUILD"
+        },
+        {
+          "jump_index": 15,
+          "from_node": "Platform 'grass' (220px wide)",
+          "to_node": "Floating Lilypad",
+          "gap_x": 40,
+          "gap_y": 360,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 40,
+            "dy": 360,
+            "max_rise": -204.8,
+            "flight_time": 1.703,
+            "apex_time": 0.64,
+            "req_speed": 23.5,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": true
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "UNFAIR": 0.01,
+            "COMFORTABLE": 0.02,
+            "TIGHT_EXECUTION": 0.18,
+            "FAIR_CHALLENGE": 0.79
+          },
+          "difficulty_score": 1.95,
+          "blind_leap_risk": 0.25,
+          "pacing_rhythm": "TENSION_BUILD"
+        },
+        {
+          "jump_index": 16,
+          "from_node": "Floating Lilypad",
+          "to_node": "Platform 'ground' (300px wide)",
+          "gap_x": 24,
+          "gap_y": -80,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 24,
+            "dy": -80,
+            "max_rise": -96.8,
+            "flight_time": 0.623,
+            "apex_time": 0.44,
+            "req_speed": 38.5,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": false
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "FAIR_CHALLENGE": 0.65,
+            "COMFORTABLE": 0.21,
+            "UNFAIR": 0.0,
+            "TIGHT_EXECUTION": 0.14
+          },
+          "difficulty_score": 1.41,
+          "blind_leap_risk": 0.15,
+          "pacing_rhythm": "TENSION_BUILD"
+        },
+        {
+          "jump_index": 17,
+          "from_node": "Platform 'ground' (300px wide)",
+          "to_node": "Floating Lilypad",
+          "gap_x": 40,
+          "gap_y": 80,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 40,
+            "dy": 80,
+            "max_rise": -204.8,
+            "flight_time": 1.395,
+            "apex_time": 0.64,
+            "req_speed": 28.7,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": true
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "FAIR_CHALLENGE": 0.77,
+            "TIGHT_EXECUTION": 0.21,
+            "COMFORTABLE": 0.02,
+            "UNFAIR": 0.0
+          },
+          "difficulty_score": 1.79,
+          "blind_leap_risk": 0.16,
+          "pacing_rhythm": "TENSION_BUILD"
+        },
+        {
+          "jump_index": 18,
+          "from_node": "Floating Lilypad",
+          "to_node": "Platform 'ground' (440px wide)",
+          "gap_x": 24,
+          "gap_y": -40,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 24,
+            "dy": -40,
+            "max_rise": -96.8,
+            "flight_time": 0.777,
+            "apex_time": 0.44,
+            "req_speed": 30.9,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": false
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "TIGHT_EXECUTION": 0.16,
+            "UNFAIR": 0.0,
+            "COMFORTABLE": 0.21,
+            "FAIR_CHALLENGE": 0.63
+          },
+          "difficulty_score": 1.36,
+          "blind_leap_risk": 0.14,
+          "pacing_rhythm": "BREATHER"
+        }
+      ]
+    },
+    "sim_casual": {
+      "level_name": "Mushroom Mire",
+      "skill_profile": "Casual (Standard Platformer Fan)",
+      "total_simulated_runs": 150,
+      "flawless_runs": 0,
+      "clear_rate_percent": 0.0,
+      "total_falls": 683,
+      "avg_falls_per_run": 4.55,
+      "choke_point_heatmap": [
+        {
+          "jump_index": 1,
+          "label": "Platform 'ground' (420px wide) -> Floating Lilypad",
+          "difficulty": 1.39,
+          "falls_count": 44,
+          "fall_rate_percent": 29.3
+        },
+        {
+          "jump_index": 3,
+          "label": "Platform 'ground' (160px wide) -> Floating Lilypad",
+          "difficulty": 1.5,
+          "falls_count": 39,
+          "fall_rate_percent": 26.0
+        },
+        {
+          "jump_index": 5,
+          "label": "Platform 'grass' (160px wide) -> Platform 'grass' (85px wide)",
+          "difficulty": 1.62,
+          "falls_count": 44,
+          "fall_rate_percent": 29.3
+        },
+        {
+          "jump_index": 6,
+          "label": "Platform 'grass' (85px wide) -> Platform 'grass' (150px wide)",
+          "difficulty": 1.8,
+          "falls_count": 47,
+          "fall_rate_percent": 31.3
+        },
+        {
+          "jump_index": 8,
+          "label": "Floating Lilypad -> Floating Lilypad",
+          "difficulty": 0.93,
+          "falls_count": 33,
+          "fall_rate_percent": 22.0
+        },
+        {
+          "jump_index": 10,
+          "label": "Platform 'ground' (360px wide) -> Floating Lilypad",
+          "difficulty": 1.73,
+          "falls_count": 46,
+          "fall_rate_percent": 30.7
+        },
+        {
+          "jump_index": 11,
+          "label": "Floating Lilypad -> Platform 'ground' (120px wide)",
+          "difficulty": 1.65,
+          "falls_count": 46,
+          "fall_rate_percent": 30.7
+        },
+        {
+          "jump_index": 12,
+          "label": "Platform 'ground' (120px wide) -> Platform 'ground' (120px wide)",
+          "difficulty": 2.01,
+          "falls_count": 92,
+          "fall_rate_percent": 61.3
+        },
+        {
+          "jump_index": 13,
+          "label": "Platform 'ground' (120px wide) -> Platform 'ground' (140px wide)",
+          "difficulty": 1.89,
+          "falls_count": 50,
+          "fall_rate_percent": 33.3
+        },
+        {
+          "jump_index": 14,
+          "label": "Platform 'ground' (140px wide) -> Platform 'grass' (220px wide)",
+          "difficulty": 1.7,
+          "falls_count": 54,
+          "fall_rate_percent": 36.0
+        },
+        {
+          "jump_index": 15,
+          "label": "Platform 'grass' (220px wide) -> Floating Lilypad",
+          "difficulty": 1.95,
+          "falls_count": 55,
+          "fall_rate_percent": 36.7
+        },
+        {
+          "jump_index": 16,
+          "label": "Floating Lilypad -> Platform 'ground' (300px wide)",
+          "difficulty": 1.41,
+          "falls_count": 46,
+          "fall_rate_percent": 30.7
+        },
+        {
+          "jump_index": 17,
+          "label": "Platform 'ground' (300px wide) -> Floating Lilypad",
+          "difficulty": 1.79,
+          "falls_count": 52,
+          "fall_rate_percent": 34.7
+        },
+        {
+          "jump_index": 18,
+          "label": "Floating Lilypad -> Platform 'ground' (440px wide)",
+          "difficulty": 1.36,
+          "falls_count": 35,
+          "fall_rate_percent": 23.3
+        }
+      ]
+    },
+    "sim_pro": {
+      "level_name": "Mushroom Mire",
+      "skill_profile": "Speedrunner / Veteran",
+      "total_simulated_runs": 150,
+      "flawless_runs": 2,
+      "clear_rate_percent": 1.3,
+      "total_falls": 463,
+      "avg_falls_per_run": 3.09,
+      "choke_point_heatmap": [
+        {
+          "jump_index": 1,
+          "label": "Platform 'ground' (420px wide) -> Floating Lilypad",
+          "difficulty": 1.39,
+          "falls_count": 25,
+          "fall_rate_percent": 16.7
+        },
+        {
+          "jump_index": 3,
+          "label": "Platform 'ground' (160px wide) -> Floating Lilypad",
+          "difficulty": 1.5,
+          "falls_count": 30,
+          "fall_rate_percent": 20.0
+        },
+        {
+          "jump_index": 5,
+          "label": "Platform 'grass' (160px wide) -> Platform 'grass' (85px wide)",
+          "difficulty": 1.62,
+          "falls_count": 23,
+          "fall_rate_percent": 15.3
+        },
+        {
+          "jump_index": 6,
+          "label": "Platform 'grass' (85px wide) -> Platform 'grass' (150px wide)",
+          "difficulty": 1.8,
+          "falls_count": 36,
+          "fall_rate_percent": 24.0
+        },
+        {
+          "jump_index": 8,
+          "label": "Floating Lilypad -> Floating Lilypad",
+          "difficulty": 0.93,
+          "falls_count": 20,
+          "fall_rate_percent": 13.3
+        },
+        {
+          "jump_index": 10,
+          "label": "Platform 'ground' (360px wide) -> Floating Lilypad",
+          "difficulty": 1.73,
+          "falls_count": 33,
+          "fall_rate_percent": 22.0
+        },
+        {
+          "jump_index": 11,
+          "label": "Floating Lilypad -> Platform 'ground' (120px wide)",
+          "difficulty": 1.65,
+          "falls_count": 29,
+          "fall_rate_percent": 19.3
+        },
+        {
+          "jump_index": 12,
+          "label": "Platform 'ground' (120px wide) -> Platform 'ground' (120px wide)",
+          "difficulty": 2.01,
+          "falls_count": 55,
+          "fall_rate_percent": 36.7
+        },
+        {
+          "jump_index": 13,
+          "label": "Platform 'ground' (120px wide) -> Platform 'ground' (140px wide)",
+          "difficulty": 1.89,
+          "falls_count": 37,
+          "fall_rate_percent": 24.7
+        },
+        {
+          "jump_index": 14,
+          "label": "Platform 'ground' (140px wide) -> Platform 'grass' (220px wide)",
+          "difficulty": 1.7,
+          "falls_count": 43,
+          "fall_rate_percent": 28.7
+        },
+        {
+          "jump_index": 15,
+          "label": "Platform 'grass' (220px wide) -> Floating Lilypad",
+          "difficulty": 1.95,
+          "falls_count": 39,
+          "fall_rate_percent": 26.0
+        },
+        {
+          "jump_index": 16,
+          "label": "Floating Lilypad -> Platform 'ground' (300px wide)",
+          "difficulty": 1.41,
+          "falls_count": 26,
+          "fall_rate_percent": 17.3
+        },
+        {
+          "jump_index": 17,
+          "label": "Platform 'ground' (300px wide) -> Floating Lilypad",
+          "difficulty": 1.79,
+          "falls_count": 33,
+          "fall_rate_percent": 22.0
+        },
+        {
+          "jump_index": 18,
+          "label": "Floating Lilypad -> Platform 'ground' (440px wide)",
+          "difficulty": 1.36,
+          "falls_count": 34,
+          "fall_rate_percent": 22.7
+        }
+      ]
+    }
+  },
+  {
+    "level_num": 4,
+    "name": "The Sunken Citadel",
+    "audit": {
+      "level_name": "The Sunken Citadel",
+      "total_jumps_audited": 9,
+      "average_difficulty_score": 1.67,
+      "unfair_jumps_flagged": 0,
+      "tight_execution_jumps": 0,
+      "blind_leap_risks": 0,
+      "jumps": [
+        {
+          "jump_index": 1,
+          "from_node": "Platform 'ground' (320px wide)",
+          "to_node": "Platform 'grass' (120px wide)",
+          "gap_x": 60,
+          "gap_y": -60,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 60,
+            "dy": -60,
+            "max_rise": -96.8,
+            "flight_time": 0.711,
+            "apex_time": 0.44,
+            "req_speed": 84.4,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": false
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "TIGHT_EXECUTION": 0.49,
+            "FAIR_CHALLENGE": 0.5,
+            "COMFORTABLE": 0.01,
+            "UNFAIR": 0.0
+          },
+          "difficulty_score": 1.78,
+          "blind_leap_risk": 0.17,
+          "pacing_rhythm": "TENSION_BUILD"
+        },
+        {
+          "jump_index": 2,
+          "from_node": "Platform 'grass' (120px wide)",
+          "to_node": "Platform 'ground' (140px wide)",
+          "gap_x": 60,
+          "gap_y": -80,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 60,
+            "dy": -80,
+            "max_rise": -96.8,
+            "flight_time": 0.623,
+            "apex_time": 0.44,
+            "req_speed": 96.3,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": false
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "FAIR_CHALLENGE": 0.69,
+            "UNFAIR": 0.01,
+            "TIGHT_EXECUTION": 0.28,
+            "COMFORTABLE": 0.02
+          },
+          "difficulty_score": 1.88,
+          "blind_leap_risk": 0.21,
+          "pacing_rhythm": "TENSION_BUILD"
+        },
+        {
+          "jump_index": 4,
+          "from_node": "Platform 'grass' (200px wide)",
+          "to_node": "Platform 'grass' (160px wide)",
+          "gap_x": 40,
+          "gap_y": 240,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 40,
+            "dy": 240,
+            "max_rise": -204.8,
+            "flight_time": 1.583,
+            "apex_time": 0.64,
+            "req_speed": 25.3,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": true
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "TIGHT_EXECUTION": 0.45,
+            "UNFAIR": 0.01,
+            "COMFORTABLE": 0.01,
+            "FAIR_CHALLENGE": 0.53
+          },
+          "difficulty_score": 1.99,
+          "blind_leap_risk": 0.25,
+          "pacing_rhythm": "TENSION_BUILD"
+        },
+        {
+          "jump_index": 5,
+          "from_node": "Platform 'grass' (160px wide)",
+          "to_node": "Platform 'ground' (140px wide)",
+          "gap_x": 40,
+          "gap_y": -40,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 40,
+            "dy": -40,
+            "max_rise": -96.8,
+            "flight_time": 0.777,
+            "apex_time": 0.44,
+            "req_speed": 51.5,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": false
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "TIGHT_EXECUTION": 0.39,
+            "FAIR_CHALLENGE": 0.6,
+            "COMFORTABLE": 0.01,
+            "UNFAIR": 0.0
+          },
+          "difficulty_score": 1.78,
+          "blind_leap_risk": 0.19,
+          "pacing_rhythm": "TENSION_BUILD"
+        },
+        {
+          "jump_index": 6,
+          "from_node": "Platform 'ground' (140px wide)",
+          "to_node": "Platform 'grass' (120px wide)",
+          "gap_x": 40,
+          "gap_y": 40,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 40,
+            "dy": 40,
+            "max_rise": -96.8,
+            "flight_time": 0.963,
+            "apex_time": 0.44,
+            "req_speed": 41.5,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": false
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "COMFORTABLE": 0.02,
+            "FAIR_CHALLENGE": 0.68,
+            "TIGHT_EXECUTION": 0.29,
+            "UNFAIR": 0.01
+          },
+          "difficulty_score": 1.74,
+          "blind_leap_risk": 0.16,
+          "pacing_rhythm": "TENSION_BUILD"
+        },
+        {
+          "jump_index": 7,
+          "from_node": "Platform 'grass' (120px wide)",
+          "to_node": "Platform 'ground' (80px wide)",
+          "gap_x": 20,
+          "gap_y": 80,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 20,
+            "dy": 80,
+            "max_rise": -96.8,
+            "flight_time": 1.035,
+            "apex_time": 0.44,
+            "req_speed": 19.3,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": false
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "COMFORTABLE": 0.05,
+            "FAIR_CHALLENGE": 0.71,
+            "TIGHT_EXECUTION": 0.24,
+            "UNFAIR": 0.0
+          },
+          "difficulty_score": 1.49,
+          "blind_leap_risk": 0.13,
+          "pacing_rhythm": "TENSION_BUILD"
+        },
+        {
+          "jump_index": 10,
+          "from_node": "Platform 'grass' (160px wide)",
+          "to_node": "Platform 'grass' (240px wide)",
+          "gap_x": 180,
+          "gap_y": -120,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 180,
+            "dy": -120,
+            "max_rise": -204.8,
+            "flight_time": 1.052,
+            "apex_time": 0.64,
+            "req_speed": 171.1,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": true
+          },
+          "fairness": "COMFORTABLE",
+          "fairness_probs": {
+            "TIGHT_EXECUTION": 0.03,
+            "COMFORTABLE": 0.5,
+            "FAIR_CHALLENGE": 0.47,
+            "UNFAIR": 0.0
+          },
+          "difficulty_score": 1.49,
+          "blind_leap_risk": 0.17,
+          "pacing_rhythm": "BREATHER"
+        },
+        {
+          "jump_index": 11,
+          "from_node": "Platform 'grass' (240px wide)",
+          "to_node": "Platform 'grass' (160px wide)",
+          "gap_x": 140,
+          "gap_y": 120,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 140,
+            "dy": 120,
+            "max_rise": -204.8,
+            "flight_time": 1.446,
+            "apex_time": 0.64,
+            "req_speed": 96.8,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": true
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "UNFAIR": 0.0,
+            "FAIR_CHALLENGE": 0.83,
+            "TIGHT_EXECUTION": 0.06,
+            "COMFORTABLE": 0.11
+          },
+          "difficulty_score": 1.55,
+          "blind_leap_risk": 0.17,
+          "pacing_rhythm": "BREATHER"
+        },
+        {
+          "jump_index": 12,
+          "from_node": "Platform 'grass' (160px wide)",
+          "to_node": "Platform 'ground' (140px wide)",
+          "gap_x": 180,
+          "gap_y": 30,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 180,
+            "dy": 30,
+            "max_rise": -204.8,
+            "flight_time": 1.325,
+            "apex_time": 0.64,
+            "req_speed": 135.8,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": true
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "FAIR_CHALLENGE": 0.68,
+            "COMFORTABLE": 0.24,
+            "TIGHT_EXECUTION": 0.08,
+            "UNFAIR": 0.0
+          },
+          "difficulty_score": 1.37,
+          "blind_leap_risk": 0.17,
+          "pacing_rhythm": "BREATHER"
+        }
+      ]
+    },
+    "sim_casual": {
+      "level_name": "The Sunken Citadel",
+      "skill_profile": "Casual (Standard Platformer Fan)",
+      "total_simulated_runs": 150,
+      "flawless_runs": 4,
+      "clear_rate_percent": 2.7,
+      "total_falls": 407,
+      "avg_falls_per_run": 2.71,
+      "choke_point_heatmap": [
+        {
+          "jump_index": 1,
+          "label": "Platform 'ground' (320px wide) -> Platform 'grass' (120px wide)",
+          "difficulty": 1.78,
+          "falls_count": 46,
+          "fall_rate_percent": 30.7
+        },
+        {
+          "jump_index": 2,
+          "label": "Platform 'grass' (120px wide) -> Platform 'ground' (140px wide)",
+          "difficulty": 1.88,
+          "falls_count": 48,
+          "fall_rate_percent": 32.0
+        },
+        {
+          "jump_index": 4,
+          "label": "Platform 'grass' (200px wide) -> Platform 'grass' (160px wide)",
+          "difficulty": 1.99,
+          "falls_count": 50,
+          "fall_rate_percent": 33.3
+        },
+        {
+          "jump_index": 5,
+          "label": "Platform 'grass' (160px wide) -> Platform 'ground' (140px wide)",
+          "difficulty": 1.78,
+          "falls_count": 52,
+          "fall_rate_percent": 34.7
+        },
+        {
+          "jump_index": 6,
+          "label": "Platform 'ground' (140px wide) -> Platform 'grass' (120px wide)",
+          "difficulty": 1.74,
+          "falls_count": 49,
+          "fall_rate_percent": 32.7
+        },
+        {
+          "jump_index": 7,
+          "label": "Platform 'grass' (120px wide) -> Platform 'ground' (80px wide)",
+          "difficulty": 1.49,
+          "falls_count": 40,
+          "fall_rate_percent": 26.7
+        },
+        {
+          "jump_index": 10,
+          "label": "Platform 'grass' (160px wide) -> Platform 'grass' (240px wide)",
+          "difficulty": 1.49,
+          "falls_count": 49,
+          "fall_rate_percent": 32.7
+        },
+        {
+          "jump_index": 11,
+          "label": "Platform 'grass' (240px wide) -> Platform 'grass' (160px wide)",
+          "difficulty": 1.55,
+          "falls_count": 41,
+          "fall_rate_percent": 27.3
+        },
+        {
+          "jump_index": 12,
+          "label": "Platform 'grass' (160px wide) -> Platform 'ground' (140px wide)",
+          "difficulty": 1.37,
+          "falls_count": 32,
+          "fall_rate_percent": 21.3
+        }
+      ]
+    },
+    "sim_pro": {
+      "level_name": "The Sunken Citadel",
+      "skill_profile": "Speedrunner / Veteran",
+      "total_simulated_runs": 150,
+      "flawless_runs": 21,
+      "clear_rate_percent": 14.0,
+      "total_falls": 286,
+      "avg_falls_per_run": 1.91,
+      "choke_point_heatmap": [
+        {
+          "jump_index": 1,
+          "label": "Platform 'ground' (320px wide) -> Platform 'grass' (120px wide)",
+          "difficulty": 1.78,
+          "falls_count": 37,
+          "fall_rate_percent": 24.7
+        },
+        {
+          "jump_index": 2,
+          "label": "Platform 'grass' (120px wide) -> Platform 'ground' (140px wide)",
+          "difficulty": 1.88,
+          "falls_count": 24,
+          "fall_rate_percent": 16.0
+        },
+        {
+          "jump_index": 4,
+          "label": "Platform 'grass' (200px wide) -> Platform 'grass' (160px wide)",
+          "difficulty": 1.99,
+          "falls_count": 40,
+          "fall_rate_percent": 26.7
+        },
+        {
+          "jump_index": 5,
+          "label": "Platform 'grass' (160px wide) -> Platform 'ground' (140px wide)",
+          "difficulty": 1.78,
+          "falls_count": 35,
+          "fall_rate_percent": 23.3
+        },
+        {
+          "jump_index": 6,
+          "label": "Platform 'ground' (140px wide) -> Platform 'grass' (120px wide)",
+          "difficulty": 1.74,
+          "falls_count": 29,
+          "fall_rate_percent": 19.3
+        },
+        {
+          "jump_index": 7,
+          "label": "Platform 'grass' (120px wide) -> Platform 'ground' (80px wide)",
+          "difficulty": 1.49,
+          "falls_count": 35,
+          "fall_rate_percent": 23.3
+        },
+        {
+          "jump_index": 10,
+          "label": "Platform 'grass' (160px wide) -> Platform 'grass' (240px wide)",
+          "difficulty": 1.49,
+          "falls_count": 25,
+          "fall_rate_percent": 16.7
+        },
+        {
+          "jump_index": 11,
+          "label": "Platform 'grass' (240px wide) -> Platform 'grass' (160px wide)",
+          "difficulty": 1.55,
+          "falls_count": 38,
+          "fall_rate_percent": 25.3
+        },
+        {
+          "jump_index": 12,
+          "label": "Platform 'grass' (160px wide) -> Platform 'ground' (140px wide)",
+          "difficulty": 1.37,
+          "falls_count": 23,
+          "fall_rate_percent": 15.3
+        }
+      ]
+    }
+  },
+  {
+    "level_num": 5,
+    "name": "Firefly Marsh",
+    "audit": {
+      "level_name": "Firefly Marsh",
+      "total_jumps_audited": 11,
+      "average_difficulty_score": 1.65,
+      "unfair_jumps_flagged": 0,
+      "tight_execution_jumps": 1,
+      "blind_leap_risks": 0,
+      "jumps": [
+        {
+          "jump_index": 1,
+          "from_node": "Platform 'ground' (480px wide)",
+          "to_node": "Platform 'ground' (160px wide)",
+          "gap_x": 100,
+          "gap_y": -60,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 100,
+            "dy": -60,
+            "max_rise": -96.8,
+            "flight_time": 0.711,
+            "apex_time": 0.44,
+            "req_speed": 140.6,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": false
+          },
+          "fairness": "TIGHT_EXECUTION",
+          "fairness_probs": {
+            "UNFAIR": 0.01,
+            "COMFORTABLE": 0.0,
+            "TIGHT_EXECUTION": 0.56,
+            "FAIR_CHALLENGE": 0.43
+          },
+          "difficulty_score": 1.93,
+          "blind_leap_risk": 0.23,
+          "pacing_rhythm": "TENSION_BUILD"
+        },
+        {
+          "jump_index": 2,
+          "from_node": "Platform 'ground' (160px wide)",
+          "to_node": "Floating Lilypad",
+          "gap_x": 90,
+          "gap_y": 72,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 90,
+            "dy": 72,
+            "max_rise": -96.8,
+            "flight_time": 1.021,
+            "apex_time": 0.44,
+            "req_speed": 88.1,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": false
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "TIGHT_EXECUTION": 0.26,
+            "FAIR_CHALLENGE": 0.73,
+            "COMFORTABLE": 0.01,
+            "UNFAIR": 0.0
+          },
+          "difficulty_score": 1.89,
+          "blind_leap_risk": 0.19,
+          "pacing_rhythm": "TENSION_BUILD"
+        },
+        {
+          "jump_index": 3,
+          "from_node": "Floating Lilypad",
+          "to_node": "Floating Lilypad",
+          "gap_x": 44,
+          "gap_y": -4,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 44,
+            "dy": -4,
+            "max_rise": -96.8,
+            "flight_time": 0.871,
+            "apex_time": 0.44,
+            "req_speed": 50.5,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": false
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "TIGHT_EXECUTION": 0.14,
+            "FAIR_CHALLENGE": 0.73,
+            "UNFAIR": 0.0,
+            "COMFORTABLE": 0.13
+          },
+          "difficulty_score": 1.3,
+          "blind_leap_risk": 0.16,
+          "pacing_rhythm": "BREATHER"
+        },
+        {
+          "jump_index": 4,
+          "from_node": "Floating Lilypad",
+          "to_node": "Platform 'ground' (220px wide)",
+          "gap_x": 34,
+          "gap_y": -68,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 34,
+            "dy": -68,
+            "max_rise": -96.8,
+            "flight_time": 0.68,
+            "apex_time": 0.44,
+            "req_speed": 50.0,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": false
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "TIGHT_EXECUTION": 0.18,
+            "UNFAIR": 0.0,
+            "FAIR_CHALLENGE": 0.7,
+            "COMFORTABLE": 0.12
+          },
+          "difficulty_score": 1.56,
+          "blind_leap_risk": 0.17,
+          "pacing_rhythm": "TENSION_BUILD"
+        },
+        {
+          "jump_index": 5,
+          "from_node": "Platform 'ground' (220px wide)",
+          "to_node": "Platform 'ground' (260px wide)",
+          "gap_x": 70,
+          "gap_y": 60,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 70,
+            "dy": 60,
+            "max_rise": -96.8,
+            "flight_time": 1.0,
+            "apex_time": 0.44,
+            "req_speed": 70.0,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": false
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "UNFAIR": 0.0,
+            "COMFORTABLE": 0.07,
+            "FAIR_CHALLENGE": 0.82,
+            "TIGHT_EXECUTION": 0.11
+          },
+          "difficulty_score": 1.6,
+          "blind_leap_risk": 0.17,
+          "pacing_rhythm": "TENSION_BUILD"
+        },
+        {
+          "jump_index": 6,
+          "from_node": "Platform 'ground' (260px wide)",
+          "to_node": "Platform 'ground' (160px wide)",
+          "gap_x": 100,
+          "gap_y": -60,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 100,
+            "dy": -60,
+            "max_rise": -96.8,
+            "flight_time": 0.711,
+            "apex_time": 0.44,
+            "req_speed": 140.6,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": false
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "TIGHT_EXECUTION": 0.31,
+            "UNFAIR": 0.0,
+            "COMFORTABLE": 0.0,
+            "FAIR_CHALLENGE": 0.69
+          },
+          "difficulty_score": 1.85,
+          "blind_leap_risk": 0.18,
+          "pacing_rhythm": "TENSION_BUILD"
+        },
+        {
+          "jump_index": 7,
+          "from_node": "Platform 'ground' (160px wide)",
+          "to_node": "Floating Lilypad",
+          "gap_x": 90,
+          "gap_y": 72,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 90,
+            "dy": 72,
+            "max_rise": -96.8,
+            "flight_time": 1.021,
+            "apex_time": 0.44,
+            "req_speed": 88.1,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": false
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "UNFAIR": 0.0,
+            "COMFORTABLE": 0.01,
+            "FAIR_CHALLENGE": 0.67,
+            "TIGHT_EXECUTION": 0.32
+          },
+          "difficulty_score": 1.97,
+          "blind_leap_risk": 0.23,
+          "pacing_rhythm": "TENSION_BUILD"
+        },
+        {
+          "jump_index": 8,
+          "from_node": "Floating Lilypad",
+          "to_node": "Floating Lilypad",
+          "gap_x": 44,
+          "gap_y": -4,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 44,
+            "dy": -4,
+            "max_rise": -96.8,
+            "flight_time": 0.871,
+            "apex_time": 0.44,
+            "req_speed": 50.5,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": false
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "COMFORTABLE": 0.11,
+            "UNFAIR": 0.0,
+            "TIGHT_EXECUTION": 0.11,
+            "FAIR_CHALLENGE": 0.78
+          },
+          "difficulty_score": 1.44,
+          "blind_leap_risk": 0.15,
+          "pacing_rhythm": "BREATHER"
+        },
+        {
+          "jump_index": 9,
+          "from_node": "Floating Lilypad",
+          "to_node": "Platform 'ground' (220px wide)",
+          "gap_x": 34,
+          "gap_y": -68,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 34,
+            "dy": -68,
+            "max_rise": -96.8,
+            "flight_time": 0.68,
+            "apex_time": 0.44,
+            "req_speed": 50.0,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": false
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "TIGHT_EXECUTION": 0.17,
+            "UNFAIR": 0.0,
+            "COMFORTABLE": 0.12,
+            "FAIR_CHALLENGE": 0.71
+          },
+          "difficulty_score": 1.51,
+          "blind_leap_risk": 0.15,
+          "pacing_rhythm": "TENSION_BUILD"
+        },
+        {
+          "jump_index": 10,
+          "from_node": "Platform 'ground' (220px wide)",
+          "to_node": "Floating Lilypad",
+          "gap_x": 75,
+          "gap_y": 72,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 75,
+            "dy": 72,
+            "max_rise": -96.8,
+            "flight_time": 1.021,
+            "apex_time": 0.44,
+            "req_speed": 73.5,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": false
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "COMFORTABLE": 0.02,
+            "UNFAIR": 0.0,
+            "TIGHT_EXECUTION": 0.17,
+            "FAIR_CHALLENGE": 0.81
+          },
+          "difficulty_score": 1.73,
+          "blind_leap_risk": 0.19,
+          "pacing_rhythm": "TENSION_BUILD"
+        },
+        {
+          "jump_index": 11,
+          "from_node": "Floating Lilypad",
+          "to_node": "Platform 'ground' (460px wide)",
+          "gap_x": 29,
+          "gap_y": -32,
+          "kinematics": {
+            "is_reachable": true,
+            "dx": 29,
+            "dy": -32,
+            "max_rise": -96.8,
+            "flight_time": 0.8,
+            "apex_time": 0.44,
+            "req_speed": 36.2,
+            "base_speed": 200.0,
+            "max_sprint_speed": 250.0,
+            "assist_type": "Standard Hop",
+            "has_mushroom": false
+          },
+          "fairness": "FAIR_CHALLENGE",
+          "fairness_probs": {
+            "FAIR_CHALLENGE": 0.55,
+            "COMFORTABLE": 0.3,
+            "TIGHT_EXECUTION": 0.15,
+            "UNFAIR": 0.0
+          },
+          "difficulty_score": 1.39,
+          "blind_leap_risk": 0.14,
+          "pacing_rhythm": "BREATHER"
+        }
+      ]
+    },
+    "sim_casual": {
+      "level_name": "Firefly Marsh",
+      "skill_profile": "Casual (Standard Platformer Fan)",
+      "total_simulated_runs": 150,
+      "flawless_runs": 1,
+      "clear_rate_percent": 0.7,
+      "total_falls": 552,
+      "avg_falls_per_run": 3.68,
+      "choke_point_heatmap": [
+        {
+          "jump_index": 1,
+          "label": "Platform 'ground' (480px wide) -> Platform 'ground' (160px wide)",
+          "difficulty": 1.93,
+          "falls_count": 89,
+          "fall_rate_percent": 59.3
+        },
+        {
+          "jump_index": 2,
+          "label": "Platform 'ground' (160px wide) -> Floating Lilypad",
+          "difficulty": 1.89,
+          "falls_count": 58,
+          "fall_rate_percent": 38.7
+        },
+        {
+          "jump_index": 3,
+          "label": "Floating Lilypad -> Floating Lilypad",
+          "difficulty": 1.3,
+          "falls_count": 42,
+          "fall_rate_percent": 28.0
+        },
+        {
+          "jump_index": 4,
+          "label": "Floating Lilypad -> Platform 'ground' (220px wide)",
+          "difficulty": 1.56,
+          "falls_count": 53,
+          "fall_rate_percent": 35.3
+        },
+        {
+          "jump_index": 5,
+          "label": "Platform 'ground' (220px wide) -> Platform 'ground' (260px wide)",
+          "difficulty": 1.6,
+          "falls_count": 49,
+          "fall_rate_percent": 32.7
+        },
+        {
+          "jump_index": 6,
+          "label": "Platform 'ground' (260px wide) -> Platform 'ground' (160px wide)",
+          "difficulty": 1.85,
+          "falls_count": 49,
+          "fall_rate_percent": 32.7
+        },
+        {
+          "jump_index": 7,
+          "label": "Platform 'ground' (160px wide) -> Floating Lilypad",
+          "difficulty": 1.97,
+          "falls_count": 49,
+          "fall_rate_percent": 32.7
+        },
+        {
+          "jump_index": 8,
+          "label": "Floating Lilypad -> Floating Lilypad",
+          "difficulty": 1.44,
+          "falls_count": 42,
+          "fall_rate_percent": 28.0
+        },
+        {
+          "jump_index": 9,
+          "label": "Floating Lilypad -> Platform 'ground' (220px wide)",
+          "difficulty": 1.51,
+          "falls_count": 39,
+          "fall_rate_percent": 26.0
+        },
+        {
+          "jump_index": 10,
+          "label": "Platform 'ground' (220px wide) -> Floating Lilypad",
+          "difficulty": 1.73,
+          "falls_count": 43,
+          "fall_rate_percent": 28.7
+        },
+        {
+          "jump_index": 11,
+          "label": "Floating Lilypad -> Platform 'ground' (460px wide)",
+          "difficulty": 1.39,
+          "falls_count": 39,
+          "fall_rate_percent": 26.0
+        }
+      ]
+    },
+    "sim_pro": {
+      "level_name": "Firefly Marsh",
+      "skill_profile": "Speedrunner / Veteran",
+      "total_simulated_runs": 150,
+      "flawless_runs": 19,
+      "clear_rate_percent": 12.7,
+      "total_falls": 369,
+      "avg_falls_per_run": 2.46,
+      "choke_point_heatmap": [
+        {
+          "jump_index": 1,
+          "label": "Platform 'ground' (480px wide) -> Platform 'ground' (160px wide)",
+          "difficulty": 1.93,
+          "falls_count": 46,
+          "fall_rate_percent": 30.7
+        },
+        {
+          "jump_index": 2,
+          "label": "Platform 'ground' (160px wide) -> Floating Lilypad",
+          "difficulty": 1.89,
+          "falls_count": 33,
+          "fall_rate_percent": 22.0
+        },
+        {
+          "jump_index": 3,
+          "label": "Floating Lilypad -> Floating Lilypad",
+          "difficulty": 1.3,
+          "falls_count": 35,
+          "fall_rate_percent": 23.3
+        },
+        {
+          "jump_index": 4,
+          "label": "Floating Lilypad -> Platform 'ground' (220px wide)",
+          "difficulty": 1.56,
+          "falls_count": 28,
+          "fall_rate_percent": 18.7
+        },
+        {
+          "jump_index": 5,
+          "label": "Platform 'ground' (220px wide) -> Platform 'ground' (260px wide)",
+          "difficulty": 1.6,
+          "falls_count": 36,
+          "fall_rate_percent": 24.0
+        },
+        {
+          "jump_index": 6,
+          "label": "Platform 'ground' (260px wide) -> Platform 'ground' (160px wide)",
+          "difficulty": 1.85,
+          "falls_count": 33,
+          "fall_rate_percent": 22.0
+        },
+        {
+          "jump_index": 7,
+          "label": "Platform 'ground' (160px wide) -> Floating Lilypad",
+          "difficulty": 1.97,
+          "falls_count": 37,
+          "fall_rate_percent": 24.7
+        },
+        {
+          "jump_index": 8,
+          "label": "Floating Lilypad -> Floating Lilypad",
+          "difficulty": 1.44,
+          "falls_count": 31,
+          "fall_rate_percent": 20.7
+        },
+        {
+          "jump_index": 9,
+          "label": "Floating Lilypad -> Platform 'ground' (220px wide)",
+          "difficulty": 1.51,
+          "falls_count": 34,
+          "fall_rate_percent": 22.7
+        },
+        {
+          "jump_index": 10,
+          "label": "Platform 'ground' (220px wide) -> Floating Lilypad",
+          "difficulty": 1.73,
+          "falls_count": 27,
+          "fall_rate_percent": 18.0
+        },
+        {
+          "jump_index": 11,
+          "label": "Floating Lilypad -> Platform 'ground' (460px wide)",
+          "difficulty": 1.39,
+          "falls_count": 29,
+          "fall_rate_percent": 19.3
+        }
+      ]
+    }
+  }
+]

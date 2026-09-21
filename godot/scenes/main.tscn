@@ -1,0 +1,94 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/player.tscn" id="1_player"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ground.png" id="2_ground"]
+[ext_resource type="Texture2D" path="res://assets/sprites/lilypad.png" id="3_lily"]
+[ext_resource type="Texture2D" path="res://assets/sprites/firefly.png" id="4_firefly"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ground"]
+size = Vector2(800, 32)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_plat"]
+size = Vector2(96, 16)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_lily"]
+size = Vector2(32, 12)
+
+[node name="Main" type="Node2D"]
+
+[node name="Background" type="CanvasLayer" parent="."]
+layer = -1
+
+[node name="ColorRect" type="ColorRect" parent="Background"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.039, 0.11, 0.078, 1)
+
+[node name="Ground" type="StaticBody2D" parent="."]
+position = Vector2(240, 250)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ground"]
+shape = SubResource("RectangleShape2D_ground")
+
+[node name="Sprite" type="Sprite2D" parent="Ground"]
+texture_repeat = 2
+texture = ExtResource("2_ground")
+region_enabled = true
+region_rect = Rect2(0, 0, 800, 32)
+
+[node name="Platform1" type="StaticBody2D" parent="."]
+position = Vector2(160, 180)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platform1"]
+shape = SubResource("RectangleShape2D_plat")
+
+[node name="Sprite" type="Sprite2D" parent="Platform1"]
+texture_repeat = 2
+texture = ExtResource("2_ground")
+region_enabled = true
+region_rect = Rect2(0, 0, 96, 16)
+
+[node name="Platform2" type="StaticBody2D" parent="."]
+position = Vector2(340, 130)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platform2"]
+shape = SubResource("RectangleShape2D_plat")
+
+[node name="Sprite" type="Sprite2D" parent="Platform2"]
+texture_repeat = 2
+texture = ExtResource("2_ground")
+region_enabled = true
+region_rect = Rect2(0, 0, 96, 16)
+
+[node name="LilyPad" type="StaticBody2D" parent="."]
+position = Vector2(240, 160)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="LilyPad"]
+shape = SubResource("RectangleShape2D_lily")
+
+[node name="Sprite" type="Sprite2D" parent="LilyPad"]
+texture = ExtResource("3_lily")
+
+[node name="Firefly" type="Sprite2D" parent="."]
+position = Vector2(340, 95)
+texture = ExtResource("4_firefly")
+
+[node name="Player" parent="." instance=ExtResource("1_player")]
+position = Vector2(80, 200)
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
+position_smoothing_enabled = true
+position_smoothing_speed = 8.0
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="ControlsLabel" type="Label" parent="HUD"]
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 350.0
+offset_bottom = 30.0
+theme_override_font_sizes/font_size = 12
+text = "A / D : Move  |  Space : Jump (Hold for high jump)"
