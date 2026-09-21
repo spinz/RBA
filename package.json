@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "description": "Ribbit's Big Adventure - Retro platformer for Web and Desktop",
   "scripts": {
-    "start": "node web/server.js",
-    "dev": "node web/server.js"
+    "build": "echo 'Static build ready'",
+    "start": "node server.js",
+    "dev": "node server.js"
   },
   "keywords": [
     "game",

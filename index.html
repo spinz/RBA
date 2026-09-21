@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Ribbit's Big Adventure - Deluxe Frog Platformer</title>
+    <meta name="description" content="Play Ribbit's Big Adventure, a retro 16-bit platformer starring Ribbit the frog across enchanted swamp worlds.">
+    <meta property="og:title" content="Ribbit's Big Adventure">
+    <meta property="og:description" content="Jump into the swamp lagoon with Ribbit! 16-bit retro platformer action playable right in your browser.">
+    <meta property="og:image" content="/banner.png">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <!-- Google Retro Arcade Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script>
+        window.browserErrors = [];
+        window.onerror = function(msg, url, line, col, error) {
+            const errStr = `[JS_ERROR] ${msg} at ${url}:${line}:${col}`;
+            console.error(errStr);
+            fetch('/log_error?msg=' + encodeURIComponent(errStr)).catch(() => {});
+        };
+        const origErr = console.error;
+        console.error = function(...args) {
+            origErr.apply(console, args);
+            fetch('/log_error?msg=' + encodeURIComponent('[CONSOLE_ERR] ' + args.join(' '))).catch(() => {});
+        };
+    </script>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #050b12;
+            background-image: 
+                radial-gradient(ellipse at 50% 10%, #0d381c 0%, transparent 65%),
+                radial-gradient(circle at 80% 80%, #0c2138 0%, transparent 55%),
+                radial-gradient(circle at 20% 90%, #1e1338 0%, transparent 50%);
+            color: #f1f5f9;
+            font-family: 'Press Start 2P', monospace, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        #game-wrapper {
+            position: relative;
+            box-shadow: 
+                0 0 0 4px #15803d,
+                0 0 0 6px #052e16,
+                0 0 40px rgba(34, 197, 94, 0.4),
+                0 25px 50px rgba(0, 0, 0, 0.9);
+            border-radius: 12px;
+            overflow: hidden;
+            background: #000;
+            max-width: 100vw;
+            max-height: 100vh;
+        }
+
+        #game-canvas-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* Optional CRT Arcade Scanline & Vignette Overlay */
+        #crt-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: linear-gradient(
+                rgba(18, 16, 16, 0) 50%, 
+                rgba(0, 0, 0, 0.25) 50%
+            ), linear-gradient(
+                90deg,
+                rgba(255, 0, 0, 0.03),
+                rgba(0, 255, 0, 0.01),
+                rgba(0, 0, 255, 0.03)
+            );
+            background-size: 100% 3px, 6px 100%;
+            box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.6);
+            display: block;
+            z-index: 999;
+            opacity: 0.85;
+            transition: opacity 0.2s ease;
+        }
+
+        canvas {
+            display: block;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+
+        /* Top control bar */
+        #top-nav {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            font-size: 11px;
+            color: #86efac;
+            letter-spacing: 1px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            background: #14532d;
+            color: #bbf7d0;
+            border: 2px solid #22c55e;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 9px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .action-btn:hover {
+            background: #16a34a;
+            color: #ffffff;
+            transform: translateY(-1px);
+            box-shadow: 0 0 12px rgba(34, 197, 94, 0.55);
+        }
+
+        .action-btn:active {
+            transform: translateY(1px);
+        }
+
+        /* Bottom instructions badge */
+        #instructions {
+            margin-top: 10px;
+            font-size: 10px;
+            color: #64748b;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        #instructions span {
+            color: #4ade4a;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="top-nav">
+        <div>RIBBIT'S BIG ADVENTURE (HD)</div>
+        <div class="btn-group">
+            <a href="/3d" class="action-btn" style="background:#0284c7; border-color:#38bdf8; color:#ffffff; font-weight:bold; text-decoration:none; display:inline-flex; align-items:center; gap:4px; box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);">3D DIORAMA</a>
+            <button class="action-btn" onclick="loadStage(0)" title="Lilypad Lagoon">S1</button>
+            <button class="action-btn" onclick="loadStage(1)" title="Cattail Canopy">S2</button>
+            <button class="action-btn" onclick="loadStage(2)" title="Mushroom Mire">S3</button>
+            <button class="action-btn" style="background:#831843; border-color:#f43f5e; color:#fecdd3; font-weight:bold;" onclick="loadStage(3)" title="The Sunken Citadel - Boss Stage">S4: BOSS</button>
+            <button class="action-btn" style="background:#047857; border-color:#34d399; color:#ecfdf5; font-weight:bold;" onclick="loadStage(4)" title="Firefly Marsh - JEV Generated">S5</button>
+            <button id="crt-toggle-btn" class="action-btn">CRT: ON</button>
+            <button id="fullscreen-btn" class="action-btn">FULLSCREEN</button>
+        </div>
+    </div>
+
+    <div id="game-wrapper">
+        <div id="game-canvas-container">
+            <div id="crt-overlay"></div>
+        </div>
+    </div>
+
+    <div id="instructions">
+        <span>ARROWS / WASD</span> to Move &bull; <span>SPACE</span> to Jump (Hold for high leap) &bull; <span>X / SHIFT</span> for Tongue
+    </div>
+
+    <!-- Scripts -->
+    <script src="phaser.min.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/assets.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/enemies.js"></script>
+    <script src="js/levels.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/game.js"></script>
+
+    <script>
+        // Quick Stage Select
+        window.loadStage = function(index) {
+            if (window.game && window.game.scene) {
+                window.soundEngine.init();
+                window.soundEngine.stopBossMusic();
+                window.soundEngine.startMusic();
+                ['TitleScene', 'GameOverScene', 'VictoryScene', 'GameScene'].forEach(key => {
+                    if (window.game.scene.isActive(key)) {
+                        window.game.scene.stop(key);
+                    }
+                });
+                window.game.scene.start('GameScene', {
+                    levelIndex: index,
+                    score: index * 1000,
+                    fireflies: index * 5
+                });
+            }
+        };
+
+        // Fullscreen toggle
+        document.getElementById('fullscreen-btn').addEventListener('click', () => {
+            const wrapper = document.getElementById('game-wrapper');
+            if (!document.fullscreenElement) {
+                if (wrapper.requestFullscreen) {
+                    wrapper.requestFullscreen();
+                } else if (wrapper.webkitRequestFullscreen) {
+                    wrapper.webkitRequestFullscreen();
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        });
+
+        // CRT scanline toggle
+        const crtOverlay = document.getElementById('crt-overlay');
+        const crtBtn = document.getElementById('crt-toggle-btn');
+        let crtActive = true;
+        crtBtn.addEventListener('click', () => {
+            crtActive = !crtActive;
+            crtOverlay.style.display = crtActive ? 'block' : 'none';
+            crtBtn.textContent = crtActive ? 'CRT: ON' : 'CRT: OFF';
+        });
+    </script>
+</body>
+</html>
