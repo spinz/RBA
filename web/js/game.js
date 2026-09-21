@@ -7,6 +7,46 @@
  * - GameOverScene: Retry screen
  */
 
+// --- STORAGE & SAVE PERSISTENCE ---
+const StorageManager = {
+    KEY: 'rba_save_data_v1',
+    load() {
+        try {
+            const raw = localStorage.getItem(this.KEY);
+            if (raw) {
+                const data = JSON.parse(raw);
+                return {
+                    highScore: Number(data.highScore) || 0,
+                    unlockedStage: Math.max(0, Number(data.unlockedStage) || 0),
+                    totalFireflies: Number(data.totalFireflies) || 0
+                };
+            }
+        } catch (e) {}
+        return { highScore: 0, unlockedStage: 0, totalFireflies: 0 };
+    },
+    save(data) {
+        try {
+            const cur = this.load();
+            const updated = {
+                highScore: Math.max(cur.highScore, Number(data.score) || 0),
+                unlockedStage: Math.max(cur.unlockedStage, Number(data.unlockedStage) || 0),
+                totalFireflies: cur.totalFireflies + (Number(data.fireflies) || 0)
+            };
+            localStorage.setItem(this.KEY, JSON.stringify(updated));
+            return updated;
+        } catch (e) {
+            return this.load();
+        }
+    },
+    updateHighScore(score) {
+        return this.save({ score });
+    },
+    unlockStage(stageIndex) {
+        return this.save({ unlockedStage: stageIndex });
+    }
+};
+window.StorageManager = StorageManager;
+
 // --- 1. BOOT SCENE ---
 class BootScene extends Phaser.Scene {
     constructor() {
@@ -109,6 +149,18 @@ class TitleScene extends Phaser.Scene {
                 repeat: -1,
                 ease: 'Sine.easeInOut'
             });
+        }
+
+        // Best Score Display
+        const save = StorageManager.load();
+        if (save.highScore > 0) {
+            this.add.text(w / 2, 345, `BEST SCORE: ${String(save.highScore).padStart(5, '0')}`, {
+                fontFamily: '"Press Start 2P", monospace, sans-serif',
+                fontSize: '12px',
+                color: '#fde047',
+                stroke: '#000000',
+                strokeThickness: 3
+            }).setOrigin(0.5);
         }
 
         // Start Prompt
@@ -556,10 +608,15 @@ class GameScene extends Phaser.Scene {
         });
 
         this.time.delayedCall(2200, () => {
+            const nextLevel = this.levelIndex + 1;
+            StorageManager.unlockStage(nextLevel);
+            StorageManager.updateHighScore(this.ui.score + 1000);
+            StorageManager.save({ fireflies: this.ui.fireflies });
+
             const levels = window.LevelBuilder.getLevels();
-            if (this.levelIndex + 1 < levels.length) {
+            if (nextLevel < levels.length) {
                 this.scene.start('GameScene', {
-                    levelIndex: this.levelIndex + 1,
+                    levelIndex: nextLevel,
                     score: this.ui.score + 1000,
                     fireflies: this.ui.fireflies
                 });
@@ -677,21 +734,33 @@ class VictoryScene extends Phaser.Scene {
 
         const card = this.add.graphics();
         card.fillStyle(0x022c22, 0.85);
-        card.fillRoundedRect(w / 2 - 180, 260, 360, 90, 10);
+        card.fillRoundedRect(w / 2 - 180, 260, 360, 100, 10);
 
-        this.add.text(w / 2, 285, `FINAL SCORE: ${String(this.finalScore).padStart(5, '0')}`, {
+        const prev = StorageManager.load();
+        const isNewHigh = this.finalScore > prev.highScore;
+        const updated = StorageManager.save({ score: this.finalScore, unlockedStage: 4, fireflies: this.finalFlies });
+
+        this.add.text(w / 2, 280, `FINAL SCORE: ${String(this.finalScore).padStart(5, '0')}`, {
             fontFamily: '"Press Start 2P", monospace, sans-serif',
             fontSize: '14px',
             color: '#ffffff'
         }).setOrigin(0.5);
 
-        this.add.text(w / 2, 320, `FIREFLIES CAUGHT: ${this.finalFlies}`, {
+        if (isNewHigh) {
+            this.add.text(w / 2, 303, 'NEW HIGH SCORE RECORD!', {
+                fontFamily: '"Press Start 2P", monospace, sans-serif',
+                fontSize: '11px',
+                color: '#fde047'
+            }).setOrigin(0.5);
+        }
+
+        this.add.text(w / 2, 328, `FIREFLIES CAUGHT: ${this.finalFlies}`, {
             fontFamily: '"Press Start 2P", monospace, sans-serif',
             fontSize: '13px',
             color: '#fef08a'
         }).setOrigin(0.5);
 
-        const restartBtn = this.add.text(w / 2, 395, 'PRESS SPACE TO PLAY AGAIN', {
+        const restartBtn = this.add.text(w / 2, 400, 'PRESS SPACE TO PLAY AGAIN', {
             fontFamily: '"Press Start 2P", monospace, sans-serif',
             fontSize: '14px',
             color: '#6ee7b7'
@@ -730,7 +799,7 @@ class GameOverScene extends Phaser.Scene {
 
         this.cameras.main.setBackgroundColor('#09090b');
 
-        this.add.text(w / 2, 130, 'GAME OVER', {
+        this.add.text(w / 2, 125, 'GAME OVER', {
             fontFamily: '"Press Start 2P", monospace, sans-serif',
             fontSize: '36px',
             color: '#ef4444',
@@ -738,15 +807,25 @@ class GameOverScene extends Phaser.Scene {
             strokeThickness: 6
         }).setOrigin(0.5);
 
-        this.add.sprite(w / 2, 210, 'frog', 6).setScale(2.5); // Hurt frog
+        this.add.sprite(w / 2, 205, 'frog', 6).setScale(2.5); // Hurt frog
 
-        this.add.text(w / 2, 280, `SCORE: ${String(this.score).padStart(5, '0')}`, {
+        const prev = StorageManager.load();
+        const isNewHigh = this.score > prev.highScore;
+        const updated = StorageManager.updateHighScore(this.score);
+
+        this.add.text(w / 2, 275, `SCORE: ${String(this.score).padStart(5, '0')}`, {
             fontFamily: '"Press Start 2P", monospace, sans-serif',
             fontSize: '15px',
             color: '#94a3b8'
         }).setOrigin(0.5);
 
-        const prompt = this.add.text(w / 2, 340, 'PRESS SPACE OR TAP TO RETRY', {
+        this.add.text(w / 2, 305, isNewHigh ? 'NEW HIGH SCORE!' : `BEST: ${String(updated.highScore).padStart(5, '0')}`, {
+            fontFamily: '"Press Start 2P", monospace, sans-serif',
+            fontSize: '12px',
+            color: isNewHigh ? '#fde047' : '#64748b'
+        }).setOrigin(0.5);
+
+        const prompt = this.add.text(w / 2, 350, 'PRESS SPACE OR TAP TO RETRY', {
             fontFamily: '"Press Start 2P", monospace, sans-serif',
             fontSize: '14px',
             color: '#fef08a'

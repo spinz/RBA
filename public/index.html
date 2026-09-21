@@ -36,6 +36,16 @@
             padding: 0;
         }
 
+        html, body {
+            touch-action: none;
+            overscroll-behavior: none;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+            width: 100%;
+            height: 100%;
+        }
+
         body {
             background-color: #050b12;
             background-image: 
@@ -64,6 +74,8 @@
             background: #000;
             max-width: 100vw;
             max-height: 100vh;
+            touch-action: none;
+            overscroll-behavior: none;
         }
 
         #game-canvas-container {
@@ -71,6 +83,8 @@
             align-items: center;
             justify-content: center;
             position: relative;
+            touch-action: none;
+            overscroll-behavior: none;
         }
 
         /* Optional CRT Arcade Scanline & Vignette Overlay */

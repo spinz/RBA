@@ -33,6 +33,24 @@ class SoundEngine {
         this.isBossMusicActive = false;
         this.bossStep = 0;
         this.bossMusicTimer = null;
+
+        this.setupAutoUnlock();
+    }
+
+    setupAutoUnlock() {
+        const unlock = () => {
+            this.init();
+            if (this.ctx && this.ctx.state === 'running') {
+                ['touchstart', 'touchend', 'pointerdown', 'keydown'].forEach(evt => {
+                    window.removeEventListener(evt, unlock);
+                    document.removeEventListener(evt, unlock);
+                });
+            }
+        };
+        ['touchstart', 'touchend', 'pointerdown', 'keydown'].forEach(evt => {
+            window.addEventListener(evt, unlock, { passive: true });
+            document.addEventListener(evt, unlock, { passive: true });
+        });
     }
 
     init() {
