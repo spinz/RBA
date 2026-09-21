@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Ribbit's Big Adventure - Retro platformer for Web and Desktop",
   "scripts": {
-    "build": "echo 'Static build ready'",
+    "build": "mkdir -p public && cp -r index.html 3d.html phaser.min.js js banner.png stage4_boss_screenshot.png public/ 2>/dev/null || true",
     "start": "node server.js",
     "dev": "node server.js"
   },
