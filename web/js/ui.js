@@ -278,7 +278,7 @@ class GameUI {
         const screenW = this.scene.scale.width;
 
         // D-Pad Left / Right
-        makeBtn(70, screenH - 60, 32, '◀', 0x334155,
+        makeBtn(70, screenH - 60, 32, '<', 0x334155,
             () => this.touchInputs.left = true,
             () => this.touchInputs.left = false
         );

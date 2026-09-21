@@ -1,5 +1,7 @@
 # Ribbit's Big Adventure (RBA)
 
+![Ribbit's Big Adventure Banner](docs/images/rba_banner.png)
+
 A high-performance retro platformer starring Ribbit the frog, built with multi-platform game engines and backed by autonomous AI level-design intelligence.
 
 ---
@@ -106,7 +108,15 @@ RBA/
 
 ## Quick Start Guide
 
-### Running the Web Edition
+### Playing Online (Vercel Deployment)
+The Web Edition is pre-configured with `vercel.json` for zero-configuration 1-click hosting on Vercel:
+1. Import `github.com/spinz/RBA` into your Vercel account.
+2. Deployment is fully automatic with root routing:
+   - Root URL (`/`): 2D Retro Platformer with mobile touch controls and CRT toggle.
+   - 3D Diorama (`/3d`): 3D Three.js interactive swamp diorama.
+3. Open the generated Vercel URL on mobile, tablet, or desktop to play anywhere without setup.
+
+### Running the Web Edition Locally
 1. Navigate to the `web/` directory:
    ```bash
    cd web

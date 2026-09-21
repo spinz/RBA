@@ -1,0 +1,19 @@
+{
+  "name": "ribbits-big-adventure",
+  "version": "1.0.0",
+  "description": "Ribbit's Big Adventure - Retro platformer for Web and Desktop",
+  "scripts": {
+    "start": "node web/server.js",
+    "dev": "node web/server.js"
+  },
+  "keywords": [
+    "game",
+    "platformer",
+    "phaser",
+    "threejs",
+    "retro",
+    "pixel-art"
+  ],
+  "author": "spinz",
+  "license": "UNLICENSED"
+}
