@@ -52,6 +52,15 @@ The Godot project is currently a movement prototype and should remain labelled t
 - Routed camera shake/flash effects through the accessibility settings gate.
 - Added a portrait mobile E2E check for focusability, guidance visibility, and horizontal-overflow prevention.
 
+## Phase 5 — gameplay reliability and onboarding slice
+
+- Added a Level 1 teaching sequence for movement, jumping, tongue use, water crossings, enemy awareness, and the optional high route.
+- Persisted `level1Complete` so mastered prompts stay out of later runs until a New Adventure is chosen.
+- Routed gameplay camera shake/flash behavior through the same accessibility gates used by the HUD.
+- Added static onboarding regression guards and verified clean browser startup after the tutorial integration.
+- Fixed King Croaker completion: the victory lotus now spawns at the defeated boss instead of a hard-coded arena coordinate, and the post-defeat reward path no longer stalls on the score popup.
+- Sequenced the level-4 gate, camera bounds, boss HUD, and boss activation so the arena transition reads as one intentional encounter intro.
+
 ## Phase 2 — campaign and onboarding
 
 1. Replace the persistent stage toolbar with a title flow: **Continue**, **New Adventure**, **Stage Map**, and **Settings**. Keep direct stage jumps behind a development query flag.

@@ -931,7 +931,7 @@ class BossKingCroaker extends Phaser.Physics.Arcade.Sprite {
             ease: 'Cubic.easeIn',
             onComplete: () => {
                 this.destroy();
-                this.scene.spawnVictoryLotus(2050, 480);
+                this.scene.spawnVictoryLotus(this.x, this.y - 28);
             }
         });
     }

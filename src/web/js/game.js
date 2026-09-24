@@ -290,6 +290,7 @@ class GameScene extends Phaser.Scene {
         this.carriedFireflies = data.fireflies || 0;
         this.isLevelCompleted = false;
         this.hasTriggeredArena = false;
+        this.arenaTransitioning = false;
     }
 
     create() {
@@ -338,6 +339,7 @@ class GameScene extends Phaser.Scene {
         this.ui.addScore(0);
         this.ui.setFireflies(this.carriedFireflies);
         this.ui.showLevelBanner(`LEVEL ${this.currentLevel.id}: ${this.currentLevel.name}`);
+        this.setupTutorial();
 
         // 7. Setup Collisions & Triggers
         this.setupCollisions();
@@ -395,6 +397,34 @@ class GameScene extends Phaser.Scene {
         this.prevTongueDown = false;
         this.pauseKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P);
         this.escapeKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
+    }
+
+    setupTutorial() {
+        const flags = StorageManager.load().profile.tutorialFlags;
+        this.tutorial = this.levelIndex === 0 && !flags.level1Complete ? { step: 0 } : null;
+        if (this.tutorial) this.ui.showTutorialPrompt('MOVE WITH A / D OR THE ARROW KEYS');
+    }
+
+    updateTutorial() {
+        if (!this.tutorial || !this.player) return;
+        const x = this.player.x;
+        const prompts = [
+            [260, 'PRESS X OR SHIFT TO LASH THE GLOWING FIREFLY'],
+            [500, 'HOLD SPACE, W, OR UP TO JUMP HIGHER'],
+            [820, 'CROSS WATER WITH SHORT, FORGIVING HOPS'],
+            [1120, 'WATCH FOR ENEMIES — TOUCHING ONE COSTS A HEART'],
+            [1450, 'OPTIONAL HIGH ROUTE: USE THE SPRING MUSHROOM']
+        ];
+        while (this.tutorial.step < prompts.length && x >= prompts[this.tutorial.step][0]) {
+            this.tutorial.step += 1;
+            if (this.tutorial.step < prompts.length) this.ui.showTutorialPrompt(prompts[this.tutorial.step][1]);
+        }
+        if (this.tutorial.step >= prompts.length) {
+            StorageManager.save({ tutorialFlags: { level1Complete: true } });
+            this.ui.showTutorialPrompt('TUTORIAL COMPLETE — EXPLORE THE SWAMP!');
+            this.tutorial = null;
+            this.time.delayedCall(1800, () => this.ui.clearTutorialPrompt());
+        }
     }
 
     togglePause(forcePaused) {
@@ -596,6 +626,8 @@ class GameScene extends Phaser.Scene {
     triggerBossArena() {
         if (this.hasTriggeredArena) return;
         this.hasTriggeredArena = true;
+        this.arenaTransitioning = true;
+        this.player.body.setVelocity(0, 0);
 
         // Restore player health to 3 hearts for the showdown
         if (this.player && !this.player.isDead) {
@@ -607,35 +639,42 @@ class GameScene extends Phaser.Scene {
         const gate = this.levelElements.arenaGate;
         if (gate) {
             gate.setVisible(true);
-            gate.body.enable = true;
-            gate.y = 260;
+            gate.body.enable = false;
+            gate.y = this.currentLevel.arenaGate.y - 120;
             this.tweens.add({
                 targets: gate,
                 y: this.currentLevel.arenaGate.y,
-                duration: 350,
+                duration: 650,
                 ease: 'Bounce.easeOut',
                 onComplete: () => {
+                    gate.body.enable = true;
+                    this.arenaTransitioning = false;
                     window.soundEngine.playGateSlam();
                     window.rbaCameraShake(this.cameras.main, 260, 0.02);
+                    this.ui.showLevelBanner('KING CROAKER APPROACHES!');
                 }
+            });
+        } else {
+            this.arenaTransitioning = false;
+        }
+
+        // Lock camera to arena after the gate closes so the transition does not
+        // snap the player into the boss room before the barrier is visible.
+        const bounds = this.currentLevel.arenaBounds;
+        if (bounds) {
+            this.time.delayedCall(650, () => {
+                this.cameras.main.setBounds(bounds.x, bounds.y, bounds.width, bounds.height);
             });
         }
 
-        // Lock camera to arena
-        const bounds = this.currentLevel.arenaBounds;
-        if (bounds) {
-            this.cameras.main.setBounds(bounds.x, bounds.y, bounds.width, bounds.height);
-        }
-
-        // Boss HUD & Intro
-        this.ui.createBossHealthBar('KING CROAKER', this.levelElements.boss ? this.levelElements.boss.maxHp : 6);
-        this.ui.showLevelBanner('BOSS: KING CROAKER');
-
-        window.soundEngine.startBossMusic();
-
-        if (this.levelElements.boss) {
-            this.levelElements.boss.activateEncounter();
-        }
+        // Boss HUD and encounter begin only after the gate has finished closing.
+        const startBossEncounter = () => {
+            this.ui.createBossHealthBar('KING CROAKER', this.levelElements.boss ? this.levelElements.boss.maxHp : 6);
+            this.ui.showLevelBanner('BOSS: KING CROAKER');
+            window.soundEngine.startBossMusic();
+            if (this.levelElements.boss) this.levelElements.boss.activateEncounter();
+        };
+        this.time.delayedCall(gate ? 700 : 0, startBossEncounter);
     }
 
     spawnVictoryLotus(x, y) {
@@ -765,6 +804,8 @@ class GameScene extends Phaser.Scene {
             tongueJustPressed
         };
 
+        this.updateTutorial();
+
         // Check Arena Gate Trigger
         if (!this.hasTriggeredArena && this.currentLevel.arenaGate) {
             if (this.player.x >= this.currentLevel.arenaGate.triggerX) {
@@ -773,7 +814,11 @@ class GameScene extends Phaser.Scene {
         }
 
         // Update player
-        this.player.update(time, delta, inputs);
+        const effectiveInputs = this.arenaTransitioning ? {
+            left: false, right: false, up: false, jumpDown: false,
+            jumpJustPressed: false, jumpReleased: false, tongueJustPressed: false
+        } : inputs;
+        this.player.update(time, delta, effectiveInputs);
 
         // Update enemies
         this.levelElements.beetles.forEach(b => b.update());
@@ -965,8 +1010,8 @@ class GameOverScene extends Phaser.Scene {
 // Game Configuration
 const config = {
     type: Phaser.AUTO,
-    width: 800,
-    height: 480,
+    width: 960,
+    height: 540,
     parent: 'game-canvas-container',
     pixelArt: true,
     physics: {

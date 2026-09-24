@@ -117,8 +117,7 @@ class GameUI {
         }).setOrigin(0.5).setDepth(99);
 
         if (this.reducedMotion) {
-            banner.setScale(1);
-            this.scene.time.delayedCall(500, () => banner.destroy());
+            this.scene.time.delayedCall(250, () => popup.destroy());
             return;
         }
         this.scene.tweens.add({
@@ -133,7 +132,7 @@ class GameUI {
 
     showLevelBanner(title) {
         this.announce(title);
-        const banner = this.scene.add.container(400, 180).setScrollFactor(0).setDepth(100);
+        const banner = this.scene.add.container(this.scene.scale.width / 2, 180).setScrollFactor(0).setDepth(100);
 
         const bg = this.scene.add.graphics();
         bg.fillStyle(0x022c22, 0.85);
@@ -148,6 +147,11 @@ class GameUI {
         }).setOrigin(0.5);
 
         banner.add([bg, text]);
+        if (this.reducedMotion) {
+            banner.setScale(1);
+            this.scene.time.delayedCall(500, () => banner.destroy());
+            return;
+        }
         banner.setScale(0);
 
         this.scene.tweens.add({
@@ -167,6 +171,31 @@ class GameUI {
                 });
             }
         });
+    }
+
+    showTutorialPrompt(message) {
+        if (this.tutorialPrompt) this.tutorialPrompt.destroy();
+        const prompt = this.scene.add.container(this.scene.scale.width / 2, this.scene.scale.height - 112)
+            .setScrollFactor(0).setDepth(140);
+        const bg = this.scene.add.rectangle(0, 0, 560, 54, 0x022c22, 0.94).setStrokeStyle(2, 0x86efac, 1);
+        const text = this.scene.add.text(0, 0, message, {
+            fontFamily: '"Press Start 2P", monospace, sans-serif', fontSize: '11px', color: '#fef08a',
+            align: 'center', wordWrap: { width: 510 }
+        }).setOrigin(0.5);
+        prompt.add([bg, text]);
+        this.tutorialPrompt = prompt;
+        this.announce(message);
+        if (!this.reducedMotion) {
+            prompt.setAlpha(0);
+            this.scene.tweens.add({ targets: prompt, alpha: 1, duration: 180 });
+        }
+    }
+
+    clearTutorialPrompt() {
+        if (this.tutorialPrompt) {
+            this.tutorialPrompt.destroy();
+            this.tutorialPrompt = null;
+        }
     }
 
     // --- Boss Encounter Health HUD ---

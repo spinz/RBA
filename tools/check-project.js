@@ -49,6 +49,13 @@ for (const required of ['game-announcements', 'orientation-hint', 'aria-live="po
 for (const setting of ['reducedFlashing', 'screenShake', 'touchOpacity']) {
     if (!gameSource.includes(setting)) failures.push(`game.js: missing setting ${setting}`);
 }
+for (const tutorialText of ['MOVE WITH A / D', 'PRESS X OR SHIFT', 'TUTORIAL COMPLETE']) {
+    if (!gameSource.includes(tutorialText)) failures.push(`game.js: missing onboarding prompt ${tutorialText}`);
+}
+for (const bossGuard of ['this.arenaTransitioning = true', 'startBossEncounter', 'spawnVictoryLotus(this.x, this.y - 28)']) {
+    const source = bossGuard.startsWith('spawn') ? fs.readFileSync(path.join(sourceRoot, 'js', 'enemies.js'), 'utf8') : gameSource;
+    if (!source.includes(bossGuard)) failures.push(`boss flow: missing regression guard ${bossGuard}`);
+}
 
 if (failures.length) {
     console.error(failures.join('\n'));
