@@ -123,10 +123,10 @@ class TitleScene extends Phaser.Scene {
             const current = fresh ? StorageManager.reset() : StorageManager.load();
             const score = fresh ? 0 : current.run.score;
             const fireflies = fresh ? 0 : current.run.carriedFireflies;
-            StorageManager.save({ currentStage: levelIndex, score, fireflies, startOfStageFireflies: fireflies });
+            StorageManager.save({ currentStage: levelIndex, score, fireflies, startOfStageScore: score, startOfStageFireflies: fireflies });
             window.soundEngine.startMusic(levelIndex);
             window.soundEngine.playJump();
-            this.scene.start('GameScene', { levelIndex, score, fireflies });
+            this.scene.start('GameScene', { levelIndex, score, fireflies, stageStartScore: score, stageStartFireflies: fireflies });
         };
         const addMenuItem = (label, y, callback) => {
             const item = this.add.text(w / 2, y, label, {
@@ -288,6 +288,8 @@ class GameScene extends Phaser.Scene {
         }
         this.carriedScore = data.score || 0;
         this.carriedFireflies = data.fireflies || 0;
+        this.stageStartScore = Math.max(0, Number(data.stageStartScore ?? this.carriedScore) || 0);
+        this.stageStartFireflies = Math.max(0, Number(data.stageStartFireflies ?? this.carriedFireflies) || 0);
         this.isLevelCompleted = false;
         this.hasTriggeredArena = false;
         this.arenaTransitioning = false;
@@ -401,6 +403,28 @@ class GameScene extends Phaser.Scene {
         this.prevTongueDown = false;
         this.pauseKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P);
         this.escapeKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
+        this.restartKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
+    }
+
+    restartStage() {
+        if (this.isPaused || this.isLevelCompleted || this.arenaTransitioning) return;
+        this.ui.announce('Restarting stage');
+        window.soundEngine.stopBossMusic();
+        window.soundEngine.stopMusic();
+        StorageManager.save({
+            currentStage: this.levelIndex,
+            score: this.stageStartScore,
+            fireflies: this.stageStartFireflies,
+            startOfStageScore: this.stageStartScore,
+            startOfStageFireflies: this.stageStartFireflies
+        });
+        this.scene.restart({
+            levelIndex: this.levelIndex,
+            score: this.stageStartScore,
+            fireflies: this.stageStartFireflies,
+            stageStartScore: this.stageStartScore,
+            stageStartFireflies: this.stageStartFireflies
+        });
     }
 
     setupTutorial() {
@@ -752,6 +776,7 @@ class GameScene extends Phaser.Scene {
                 unlockedStage: nextLevel,
                 score: this.ui.score + 1000,
                 fireflies: this.ui.fireflies,
+                startOfStageScore: this.ui.score + 1000,
                 startOfStageFireflies: this.ui.fireflies
             });
 
@@ -760,7 +785,9 @@ class GameScene extends Phaser.Scene {
                 this.scene.start('GameScene', {
                     levelIndex: nextLevel,
                     score: this.ui.score + 1000,
-                    fireflies: this.ui.fireflies
+                    fireflies: this.ui.fireflies,
+                    stageStartScore: this.ui.score + 1000,
+                    stageStartFireflies: this.ui.fireflies
                 });
             } else {
                 this.scene.start('VictoryScene', {
@@ -777,6 +804,11 @@ class GameScene extends Phaser.Scene {
             Phaser.Input.Keyboard.JustDown(this.escapeKey)
         ) {
             this.togglePause();
+            return;
+        }
+
+        if (Phaser.Input.Keyboard.JustDown(this.restartKey)) {
+            this.restartStage();
             return;
         }
 

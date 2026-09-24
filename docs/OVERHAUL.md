@@ -90,3 +90,9 @@ The Godot project is currently a movement prototype and should remain labelled t
 - Added a compact fixed HUD objective for every stage, with local firefly progress shown separately from the carried campaign total.
 - Boss stages now identify the King Croaker objective before the encounter begins; shrine stages identify the goal shrine.
 - Added static regression guards for objective HUD wiring.
+
+## Phase 7 — restart reliability slice
+
+- Added an in-level `R` restart that restores the score and fireflies captured at stage start.
+- Persisted the stage-start score alongside the existing stage-start firefly checkpoint for safe reloads.
+- Kept restart disabled during pause, boss-gate transitions, and stage completion to avoid duplicate scene transitions.

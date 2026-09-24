@@ -2,7 +2,7 @@
 const RbaSaveDefaults = Object.freeze({
     version: 2,
     profile: { unlockedStage: 0, bestScore: 0, bestFireflyCount: 0, settings: {}, tutorialFlags: {} },
-    run: { currentStage: 0, score: 0, carriedFireflies: 0, startOfStageFireflies: 0 }
+    run: { currentStage: 0, score: 0, carriedFireflies: 0, startOfStageScore: 0, startOfStageFireflies: 0 }
 });
 
 const cloneSaveDefaults = () => structuredClone(RbaSaveDefaults);
@@ -27,6 +27,7 @@ const StorageManager = {
                 currentStage: Math.max(0, Number(run.currentStage ?? raw.currentStage) || 0),
                 score: Math.max(0, Number(run.score ?? raw.score) || 0),
                 carriedFireflies: Math.max(0, Number(run.carriedFireflies ?? raw.fireflies) || 0),
+                startOfStageScore: Math.max(0, Number(run.startOfStageScore) || 0),
                 startOfStageFireflies: Math.max(0, Number(run.startOfStageFireflies) || 0)
             }
         };
@@ -55,6 +56,7 @@ const StorageManager = {
             currentStage: Math.max(0, Number(data.currentStage ?? current.run.currentStage) || 0),
             score: Math.max(0, Number(data.score ?? current.run.score) || 0),
             carriedFireflies: Math.max(0, Number(data.fireflies ?? current.run.carriedFireflies) || 0),
+            startOfStageScore: Math.max(0, Number(data.startOfStageScore ?? current.run.startOfStageScore) || 0),
             startOfStageFireflies: Math.max(0, Number(data.startOfStageFireflies ?? current.run.startOfStageFireflies) || 0)
         };
         try { localStorage.setItem(this.KEY, JSON.stringify(migrated)); } catch (error) {}

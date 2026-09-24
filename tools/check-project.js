@@ -61,6 +61,12 @@ for (const bossGuard of ['this.arenaTransitioning = true', 'startBossEncounter',
     const source = bossGuard.startsWith('spawn') ? fs.readFileSync(path.join(sourceRoot, 'js', 'enemies.js'), 'utf8') : gameSource;
     if (!source.includes(bossGuard)) failures.push(`boss flow: missing regression guard ${bossGuard}`);
 }
+for (const restartGuard of ['this.restartKey', 'restartStage()', 'startOfStageScore']) {
+    const source = restartGuard === 'startOfStageScore'
+        ? fs.readFileSync(path.join(sourceRoot, 'js', 'save-data.js'), 'utf8') + gameSource
+        : gameSource;
+    if (!source.includes(restartGuard)) failures.push(`restart flow: missing regression guard ${restartGuard}`);
+}
 
 if (failures.length) {
     console.error(failures.join('\n'));
