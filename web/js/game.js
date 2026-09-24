@@ -30,7 +30,9 @@ const StorageManager = {
             const updated = {
                 highScore: Math.max(cur.highScore, Number(data.score) || 0),
                 unlockedStage: Math.max(cur.unlockedStage, Number(data.unlockedStage) || 0),
-                totalFireflies: cur.totalFireflies + (Number(data.fireflies) || 0)
+                // `fireflies` is the run's cumulative count, so keep the best run
+                // instead of adding the same carried total at every stage clear.
+                totalFireflies: Math.max(cur.totalFireflies, Number(data.fireflies) || 0)
             };
             localStorage.setItem(this.KEY, JSON.stringify(updated));
             return updated;
@@ -216,10 +218,12 @@ class GameScene extends Phaser.Scene {
     init(data) {
         const urlParams = new URLSearchParams(window.location.search);
         const urlLevel = urlParams.get('level');
-        if (urlLevel !== null && !isNaN(parseInt(urlLevel, 10))) {
-            this.levelIndex = Math.max(0, parseInt(urlLevel, 10) - 1);
+        const requestedLevel = Number.parseInt(urlLevel, 10);
+        if (!window.__rbaLevelQueryConsumed && urlLevel !== null && Number.isFinite(requestedLevel)) {
+            this.levelIndex = Math.max(0, requestedLevel - 1);
+            window.__rbaLevelQueryConsumed = true;
         } else {
-            this.levelIndex = data.levelIndex || 0;
+            this.levelIndex = Math.max(0, Number(data.levelIndex) || 0);
         }
         this.carriedScore = data.score || 0;
         this.carriedFireflies = data.fireflies || 0;
@@ -229,7 +233,9 @@ class GameScene extends Phaser.Scene {
 
     create() {
         const levels = window.LevelBuilder.getLevels();
-        this.currentLevel = levels[this.levelIndex % levels.length];
+        this.levelIndex = Phaser.Math.Clamp(this.levelIndex, 0, levels.length - 1);
+        this.currentLevel = levels[this.levelIndex];
+        this.isPaused = false;
 
         // 1. Build level geometry, hazards, collectibles, enemies
         this.levelElements = window.LevelBuilder.build(this, this.currentLevel);
@@ -268,8 +274,8 @@ class GameScene extends Phaser.Scene {
         // 6. UI Overlay
         this.ui = new window.GameUI(this);
         this.ui.score = this.carriedScore;
-        this.ui.fireflies = this.carriedFireflies;
         this.ui.addScore(0);
+        this.ui.setFireflies(this.carriedFireflies);
         this.ui.showLevelBanner(`LEVEL ${this.currentLevel.id}: ${this.currentLevel.name}`);
 
         // 7. Setup Collisions & Triggers
@@ -277,6 +283,14 @@ class GameScene extends Phaser.Scene {
 
         // 8. Setup Inputs
         this.setupInputs();
+
+        this.handleVisibilityChange = () => {
+            if (document.hidden && !this.isPaused) this.togglePause(true);
+        };
+        document.addEventListener('visibilitychange', this.handleVisibilityChange);
+        this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+            document.removeEventListener('visibilitychange', this.handleVisibilityChange);
+        });
 
         // 9. Event listeners
         this.events.on('add_score', (pts, x, y) => {
@@ -295,7 +309,8 @@ class GameScene extends Phaser.Scene {
             window.soundEngine.stopMusic();
             this.scene.start('GameOverScene', {
                 levelIndex: this.levelIndex,
-                score: this.ui.score
+                score: this.ui.score,
+                fireflies: this.carriedFireflies
             });
         });
 
@@ -317,6 +332,25 @@ class GameScene extends Phaser.Scene {
 
         this.prevJumpDown = false;
         this.prevTongueDown = false;
+        this.pauseKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P);
+        this.escapeKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
+    }
+
+    togglePause(forcePaused) {
+        const shouldPause = typeof forcePaused === 'boolean' ? forcePaused : !this.isPaused;
+        if (shouldPause === this.isPaused) return;
+
+        this.isPaused = shouldPause;
+        if (shouldPause) {
+            this.physics.world.pause();
+            this.tweens.pauseAll();
+            this.time.paused = true;
+        } else {
+            this.physics.world.resume();
+            this.tweens.resumeAll();
+            this.time.paused = false;
+        }
+        this.ui.setPaused(shouldPause);
     }
 
     setupCollisions() {
@@ -374,7 +408,7 @@ class GameScene extends Phaser.Scene {
 
         // Tongue Tip vs Fireflies
         this.physics.add.overlap(this.player.tongueTip, firefliesGroup, (tip, item) => {
-            this.player.grabObject(item);
+            if (this.player.tongueActive) this.player.grabObject(item);
         });
 
         // Player vs Golden Lotus
@@ -384,7 +418,7 @@ class GameScene extends Phaser.Scene {
 
         // Tongue Tip vs Golden Lotus
         this.physics.add.overlap(this.player.tongueTip, lotusGroup, (tip, item) => {
-            this.player.grabObject(item);
+            if (this.player.tongueActive) this.player.grabObject(item);
         });
 
         // Player vs Goal Shrine (if unlocked)
@@ -411,7 +445,7 @@ class GameScene extends Phaser.Scene {
 
             // Tongue Tip vs Beetle
             this.physics.add.overlap(this.player.tongueTip, beetle, (tip, b) => {
-                if (!b.isDefeated) {
+                if (this.player.tongueActive && !b.isDefeated) {
                     this.player.grabObject(b);
                 }
             });
@@ -434,7 +468,7 @@ class GameScene extends Phaser.Scene {
 
             // Tongue Tip vs Mosquito
             this.physics.add.overlap(this.player.tongueTip, mosquito, (tip, m) => {
-                if (!m.isDefeated) {
+                if (this.player.tongueActive && !m.isDefeated) {
                     this.player.grabObject(m);
                 }
             });
@@ -463,7 +497,7 @@ class GameScene extends Phaser.Scene {
 
             // Tongue Tip vs Boss (Tongue Whip Damage!)
             this.physics.add.overlap(this.player.tongueTip, boss, (tip, b) => {
-                b.takeTongueDamage(this.player);
+                if (this.player.tongueActive) b.takeTongueDamage(this.player);
             });
 
             // Player Spat Projectiles vs Boss
@@ -490,7 +524,7 @@ class GameScene extends Phaser.Scene {
 
             // Tongue Tip vs Venom Balls (Catch & eat!)
             this.physics.add.overlap(this.player.tongueTip, boss.venomBalls, (tip, vb) => {
-                this.player.grabObject(vb);
+                if (this.player.tongueActive) this.player.grabObject(vb);
             });
 
             // Venom balls bounce on platforms
@@ -609,9 +643,11 @@ class GameScene extends Phaser.Scene {
 
         this.time.delayedCall(2200, () => {
             const nextLevel = this.levelIndex + 1;
-            StorageManager.unlockStage(nextLevel);
-            StorageManager.updateHighScore(this.ui.score + 1000);
-            StorageManager.save({ fireflies: this.ui.fireflies });
+            StorageManager.save({
+                unlockedStage: nextLevel,
+                score: this.ui.score + 1000,
+                fireflies: this.ui.fireflies
+            });
 
             const levels = window.LevelBuilder.getLevels();
             if (nextLevel < levels.length) {
@@ -630,6 +666,16 @@ class GameScene extends Phaser.Scene {
     }
 
     update(time, delta) {
+        if (
+            Phaser.Input.Keyboard.JustDown(this.pauseKey) ||
+            Phaser.Input.Keyboard.JustDown(this.escapeKey)
+        ) {
+            this.togglePause();
+            return;
+        }
+
+        if (this.isPaused) return;
+
         // Collect keyboard + touch inputs
         const touch = this.ui.touchInputs;
 
@@ -637,7 +683,7 @@ class GameScene extends Phaser.Scene {
         const right = this.cursors.right.isDown || this.wasd.right.isDown || touch.right;
         const up = this.cursors.up.isDown || this.wasd.up.isDown;
 
-        const jumpDown = this.cursors.space.isDown || this.wasd.space.isDown || this.cursors.up.isDown || touch.jump;
+        const jumpDown = this.cursors.space.isDown || this.wasd.space.isDown || this.cursors.up.isDown || this.wasd.up.isDown || touch.jump;
         const jumpJustPressed = jumpDown && !this.prevJumpDown;
         const jumpReleased = !jumpDown && this.prevJumpDown;
         this.prevJumpDown = jumpDown;
@@ -791,6 +837,7 @@ class GameOverScene extends Phaser.Scene {
     init(data) {
         this.levelIndex = data.levelIndex || 0;
         this.score = data.score || 0;
+        this.fireflies = data.fireflies || 0;
     }
 
     create() {
@@ -843,7 +890,7 @@ class GameOverScene extends Phaser.Scene {
             this.scene.start('GameScene', {
                 levelIndex: this.levelIndex,
                 score: 0,
-                fireflies: 0
+                fireflies: this.fireflies
             });
         };
 

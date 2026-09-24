@@ -1,4 +1,6 @@
 import math
+import json
+import os
 from typing import Dict, Any, Tuple, Optional
 
 class RibbitPhysics:
@@ -6,13 +8,17 @@ class RibbitPhysics:
     Kinematic model of Ribbit's platformer movement from player.js / player.gd.
     Screen coordinates: +x is right, +y is down.
     """
-    GRAVITY = 1000.0            # px/s^2 (downward)
-    BASE_SPEED = 200.0          # px/s (standard run)
+    _CONSTANTS_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../src/web/data/physics.json"))
+    with open(_CONSTANTS_PATH, "r", encoding="utf-8") as _constants_file:
+        _CONSTANTS = json.load(_constants_file)
+
+    GRAVITY = float(_CONSTANTS["gravity"])
+    BASE_SPEED = float(_CONSTANTS["runSpeed"])
     MAX_SPRINT_SPEED = 250.0    # px/s (full momentum)
-    NORMAL_JUMP_VEL = -440.0    # px/s (upward)
-    SUPER_JUMP_VEL = -640.0     # px/s (spring mushroom)
-    TONGUE_REACH = 135.0        # px
-    COYOTE_TIME = 0.12          # seconds
+    NORMAL_JUMP_VEL = float(_CONSTANTS["jumpVelocity"])
+    SUPER_JUMP_VEL = float(_CONSTANTS["springVelocity"])
+    TONGUE_REACH = float(_CONSTANTS["tongueReach"])
+    COYOTE_TIME = float(_CONSTANTS["coyoteTimeMs"]) / 1000
 
     @classmethod
     def analyze_jump(cls, start_pos: Tuple[float, float], target_pos: Tuple[float, float], 

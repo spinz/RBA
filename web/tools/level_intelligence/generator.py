@@ -230,10 +230,3 @@ class LevelDirectorGenerator:
             "pacing_history": recent_chunks
         }
 
-    @staticmethod
-    def to_js_code(level_data: Dict[str, Any]) -> str:
-        """
-        Formats the level dictionary into clean JavaScript for levels.js.
-        """
-        return f"""            // --- LEVEL {level_data['id']}: {level_data['name']} (Generated & Balanced by JEV System 1) ---
-            {json.dumps(level_data, indent=16)}"""

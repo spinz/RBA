@@ -28,15 +28,17 @@ class PlaytestSimulator:
     }
 
     @classmethod
-    def run_simulation(cls, audit_report: Dict[str, Any], runs: int = 100, skill_level: str = "casual") -> Dict[str, Any]:
+    def run_simulation(cls, audit_report: Dict[str, Any], runs: int = 100, skill_level: str = "casual", seed: int = 1337) -> Dict[str, Any]:
         profile = cls.SKILL_PROFILES.get(skill_level, cls.SKILL_PROFILES["casual"])
         jumps = audit_report.get("jumps", [])
+        rng = random.Random(seed)
         
         if not jumps:
             return {"error": "No jumps to simulate in audit report"}
 
         choke_point_tracker = {j["jump_index"]: 0 for j in jumps}
-        successful_runs = 0
+        flawless_runs = 0
+        completed_runs = 0
         total_falls = 0
 
         for run_id in range(runs):
@@ -54,6 +56,7 @@ class PlaytestSimulator:
                     lives -= 1
                     if lives <= 0:
                         completed_level = False
+                        break
                     continue
 
                 # Calculate success probability based on JEV difficulty (0 to 3 scale)
@@ -69,7 +72,7 @@ class PlaytestSimulator:
                     p_success *= 0.15
 
                 # Roll check
-                if random.random() > max(0.05, min(0.99, p_success)):
+                if rng.random() > max(0.05, min(0.99, p_success)):
                     # Player missed jump / took water fall
                     choke_point_tracker[jump["jump_index"]] += 1
                     total_falls += 1
@@ -77,9 +80,12 @@ class PlaytestSimulator:
                     lives -= 1
                     if lives <= 0:
                         completed_level = False
+                        break
 
             if not fell_in_run:
-                successful_runs += 1
+                flawless_runs += 1
+            if completed_level:
+                completed_runs += 1
 
         # Compile heatmap
         heatmap = []
@@ -98,9 +104,12 @@ class PlaytestSimulator:
         return {
             "level_name": audit_report.get("level_name", "Unknown"),
             "skill_profile": profile["name"],
+            "random_seed": seed,
             "total_simulated_runs": runs,
-            "flawless_runs": successful_runs,
-            "clear_rate_percent": round((successful_runs / runs) * 100, 1),
+            "completed_runs": completed_runs,
+            "flawless_runs": flawless_runs,
+            "clear_rate_percent": round((completed_runs / runs) * 100, 1),
+            "flawless_rate_percent": round((flawless_runs / runs) * 100, 1),
             "total_falls": total_falls,
             "avg_falls_per_run": round(total_falls / runs, 2),
             "choke_point_heatmap": heatmap

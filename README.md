@@ -10,9 +10,14 @@ A high-performance retro platformer starring Ribbit the frog, built with multi-p
 
 Ribbit's Big Adventure follows Ribbit across vibrant swamp ecosystems, treacherous canopies, glowing fungal groves, and ancient sunken ruins. The game combines classic 16-bit momentum-based platforming mechanics with procedural level balancing and variable jump physics.
 
-The project encompasses two coordinated implementations:
-1. **Web Edition (`web/`)**: Browser-accessible implementation featuring both a 2D Phaser engine and a 3D Three.js diorama mode.
-2. **Godot 4 Native Edition (`godot/`)**: High-performance desktop version built in Godot 4, targeting optimal hardware rendering with OpenGL compatibility and nearest-neighbor pixel filtering.
+The project currently has one complete game and one prototype:
+1. **Web Edition (`src/web/`)**: The primary playable game, featuring the 2D Phaser campaign.
+2. **Godot 4 Prototype (`godot/`)**: A native movement prototype used to explore desktop rendering and controller feel. It is not yet feature-equivalent with the web campaign.
+
+`src/web/` is the only authored web client source. Vite builds it into ignored
+`dist/` output. The old root, `public/`, and `web/` client mirrors remain
+tracked until a separate reviewed cleanup; they are not build inputs. Do not
+edit them. The Python level-intelligence tools under `web/tools/` remain active.
 
 ---
 
@@ -35,11 +40,12 @@ The project encompasses two coordinated implementations:
 - **Momentum Bouncing**: Enhanced vertical launch velocity off fungal springs and bouncy lilypads.
 - **Tongue Attack**: Directional tongue strike to snare fireflies and neutralize swamp pests.
 
-### Controls (Web & Godot)
+### Controls
 - **Move Left / Right**: `A` / `D` or `Left` / `Right Arrow`
 - **Jump**: `Space` / `W` / `Up Arrow` (hold to leap higher)
-- **Tongue Attack / Interact**: `J` / `X` / `Enter`
-- **3D Camera Rotate (Web 3D mode)**: Left-click and drag with mouse (OrbitControls)
+- **2D Web Tongue Attack**: `X` / `Shift`
+- **Godot Prototype Attack**: `J` / `X` / `Enter`
+- **Pause (2D Web)**: `P` / `Escape`
 
 ---
 
@@ -83,23 +89,12 @@ RBA/
 │   ├── project.godot           # Godot project configuration
 │   └── run.sh                  # One-click launcher script
 │
-├── web/                        # Web Edition (Phaser + Three.js)
-│   ├── index.html              # 2D Phaser platformer client
-│   ├── 3d.html                 # 3D Three.js diorama client
-│   ├── phaser.min.js           # Phaser 2D library
-│   ├── server.py               # Lightweight Python dev server
-│   ├── server.js               # Node.js dev server
-│   ├── js/
-│   │   ├── player.js           # Player state machine and movement
-│   │   ├── enemies.js          # Enemy AI routines
-│   │   ├── levels.js           # Stage geometries and placements
-│   │   ├── assets.js           # Procedural sprite canvas generator
-│   │   ├── audio.js            # WebAudio procedural synthesizer
-│   │   ├── game.js             # Main Phaser scene loop
-│   │   └── game3d.js           # Three.js 3D diorama renderer
-│   └── tools/
-│       └── level_intelligence/ # JEV kinematic physics & simulation suite
-│
+├── src/web/                    # Canonical 2D HTML, JS, and static assets
+├── dist/                       # Ignored Vite production build
+├── public/                     # Historical tracked client mirror
+├── web/                        # Historical client mirror + level intelligence tools
+├── tools/                      # Verification scripts and Vite compatibility wrapper
+├── server.js                   # Local server restricted to dist/
 ├── .gitignore                  # Git ignore rules
 └── README.md                   # Repository documentation
 ```
@@ -111,25 +106,47 @@ RBA/
 ### Playing Online (Vercel Deployment)
 The Web Edition is pre-configured with `vercel.json` for zero-configuration 1-click hosting on Vercel:
 1. Import `github.com/spinz/RBA` into your Vercel account.
-2. Deployment is fully automatic with root routing:
-   - Root URL (`/`): 2D Retro Platformer with mobile touch controls and CRT toggle.
-   - 3D Diorama (`/3d`): 3D Three.js interactive swamp diorama.
+2. Deployment is fully automatic at the root URL (`/`) with mobile touch controls and a CRT toggle.
 3. Open the generated Vercel URL on mobile, tablet, or desktop to play anywhere without setup.
 
 ### Running the Web Edition Locally
-1. Navigate to the `web/` directory:
-   ```bash
-   cd web
-   ```
-2. Start the local development server:
-   ```bash
-   python3 server.py
-   # or:
-   python3 -m http.server 8080
-   ```
-3. Open your browser:
-   - 2D Platformer: `http://localhost:8080/`
-   - 3D Diorama: `http://localhost:8080/3d.html`
+Node.js 22 is required. From the repository root, install the locked packages
+and start the Vite development server:
+
+```bash
+npm ci
+npm run dev
+```
+
+For the production build and local production server:
+
+```bash
+npm start
+```
+
+Open your browser:
+
+- Development: `http://127.0.0.1:5173/`
+- Production: `http://127.0.0.1:3050/`
+
+### Verification
+
+Run the project checks before committing:
+
+```bash
+npm run build
+npm run lint
+npm run format:check
+npm run typecheck
+npm test
+python -m unittest discover -s web/tools/level_intelligence -p "test_*.py"
+npx playwright install chromium
+npm run test:e2e
+```
+
+The browser test runs against `dist/`. All required validation runs without AI
+credentials. See [CONTRIBUTING.md](CONTRIBUTING.md) for source ownership and
+the current scope of JavaScript type checking.
 
 ### Running the Godot 4 Edition
 Requirements: Godot 4.x installed on your system.

@@ -52,6 +52,7 @@ class FrogPlayer extends Phaser.Physics.Arcade.Sprite {
         this.tongueTip.setVisible(false);
         this.tongueTip.body.setAllowGravity(false);
         this.tongueTip.body.setCircle(7);
+        this.tongueTip.body.enable = false;
 
         // Player Stats & Status
         this.hp = 3;
@@ -304,6 +305,7 @@ class FrogPlayer extends Phaser.Physics.Arcade.Sprite {
                 this.tongueLength = 0;
                 this.caughtTarget = null;
                 this.tongueTip.setVisible(true);
+                this.tongueTip.body.enable = true;
                 this.tongueTip.setPosition(mouthX, mouthY);
 
                 // Determine angle: straight or 45 degree upward
@@ -332,6 +334,7 @@ class FrogPlayer extends Phaser.Physics.Arcade.Sprite {
                     this.tongueActive = false;
                     this.tongueState = 'idle';
                     this.tongueTip.setVisible(false);
+                    this.tongueTip.body.enable = false;
 
                     // Swallow caught target
                     if (this.caughtTarget) {

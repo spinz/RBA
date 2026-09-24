@@ -4,9 +4,10 @@ from tools.level_intelligence.auditor import LevelAuditor
 from tools.level_intelligence.simulate import PlaytestSimulator
 
 auditor = LevelAuditor()
-levels = auditor.parse_js_levels("js/levels.js")
+levels_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../src/web/data/levels.json"))
+levels = auditor.parse_level_data(levels_path)
 
-print(f"Loaded {len(levels)} levels from js/levels.js")
+print(f"Loaded {len(levels)} levels from canonical level JSON")
 all_results = []
 
 for idx, lvl in enumerate(levels):

@@ -471,9 +471,16 @@ class BossKingCroaker extends Phaser.Physics.Arcade.Sprite {
             this.shadow.setAlpha(Math.max(0.15, 0.6 - heightAboveGround * 0.0015));
         }
 
-        // Clean up dead shockwaves
-        this.shockwaves = this.shockwaves.filter(sw => sw.active);
-        this.shockwaves.forEach(sw => sw.update(time));
+        // Keep the original array reference so the physics overlap registered by
+        // GameScene continues to observe newly spawned shockwaves.
+        for (let i = this.shockwaves.length - 1; i >= 0; i--) {
+            const shockwave = this.shockwaves[i];
+            if (!shockwave.active) {
+                this.shockwaves.splice(i, 1);
+            } else {
+                shockwave.update(time);
+            }
+        }
 
         // Facing direction toward player
         if (['IDLE', 'WINDUP', 'STUNNED', 'SPIT'].includes(this.state)) {
@@ -535,7 +542,9 @@ class BossKingCroaker extends Phaser.Physics.Arcade.Sprite {
                 break;
 
             case 'JUMP_UP':
-                if (this.body.velocity.y >= 0 && this.y < -30) {
+                // The velocity sign change is the reachable apex. The old y < -30
+                // check was impossible from the arena floor and soft-locked the fight.
+                if (this.body.velocity.y >= 0) {
                     this.state = 'AIR_AIM';
                     this.body.setAllowGravity(false);
                     this.body.setVelocity(0, 0);

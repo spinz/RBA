@@ -35,10 +35,6 @@ const server = http.createServer((req, res) => {
     if (pathname === '/') {
         pathname = '/index.html';
     }
-    if (pathname === '/3d') {
-        pathname = '/3d.html';
-    }
-
     // Safe path traversal check
     const safePath = path.normalize(path.join(PUBLIC_DIR, pathname));
     if (!safePath.startsWith(PUBLIC_DIR)) {

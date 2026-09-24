@@ -14,16 +14,15 @@ import sys
 import os
 import argparse
 import json
-import re
 from .auditor import LevelAuditor
 from .simulate import PlaytestSimulator
 from .generator import LevelDirectorGenerator
 
-JS_LEVELS_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../js/levels.js"))
+LEVELS_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../src/web/data/levels.json"))
 
 def cmd_audit(args):
     auditor = LevelAuditor()
-    levels = auditor.parse_js_levels(JS_LEVELS_PATH)
+    levels = auditor.parse_level_data(LEVELS_PATH)
     level_idx = args.level - 1
 
     if level_idx < 0 or level_idx >= len(levels):
@@ -56,7 +55,7 @@ def cmd_audit(args):
 
 def cmd_simulate(args):
     auditor = LevelAuditor()
-    levels = auditor.parse_js_levels(JS_LEVELS_PATH)
+    levels = auditor.parse_level_data(LEVELS_PATH)
     level_idx = args.level - 1
 
     if level_idx < 0 or level_idx >= len(levels):
@@ -66,14 +65,15 @@ def cmd_simulate(args):
     target_level = levels[level_idx]
     print(f"\n[JEV SIMULATOR] Auditing & Running {args.runs} Virtual Playtest Runs on '{target_level['name']}' ({args.skill})...")
     report = auditor.audit_level(target_level, max_jumps_to_audit=args.max_jumps)
-    sim = PlaytestSimulator.run_simulation(report, runs=args.runs, skill_level=args.skill)
+    sim = PlaytestSimulator.run_simulation(report, runs=args.runs, skill_level=args.skill, seed=args.seed)
 
     print(f"\n=======================================================")
     print(f" MONTE CARLO PLAYTEST RESULTS: {sim['level_name']}")
     print(f" Skill Profile: {sim['skill_profile']}")
     print(f"=======================================================")
     print(f"- Simulated Runs:          {sim['total_simulated_runs']}")
-    print(f"- Flawless Clear Rate:     {sim['clear_rate_percent']}%")
+    print(f"- Estimated Clear Rate:    {sim['clear_rate_percent']}%")
+    print(f"- Flawless Run Rate:       {sim['flawless_rate_percent']}%")
     print(f"- Total Water Falls/Hurt:  {sim['total_falls']} (Avg {sim['avg_falls_per_run']} per run)")
     print(f"-------------------------------------------------------")
     print(" CHOKE POINT HEATMAP (Failure Rate by Jump):")
@@ -114,33 +114,16 @@ def cmd_generate(args):
 
 def cmd_export_level5(args):
     gen = LevelDirectorGenerator()
-    print(f"\n[JEV EXPORT] Generating and injecting verified Level 5: Firefly Marsh into {JS_LEVELS_PATH}...")
+    print(f"\n[JEV EXPORT] Generating and injecting verified Level 5: Firefly Marsh into {LEVELS_PATH}...")
     result = gen.generate_level(level_id=5, level_name="Firefly Marsh", target_width=2800)
     level = result["level"]
-
-    # Read existing levels.js
-    with open(JS_LEVELS_PATH, "r", encoding="utf-8") as f:
-        content = f.read()
-
-    # Check if Level 5 already exists
-    if "LEVEL 5: Firefly Marsh" in content:
-        print("Notice: Level 5 already exists in levels.js. Replacing with freshly generated version...")
-        # Replace existing Level 5 block
-        content = re.sub(
-            r"// --- LEVEL 5: Firefly Marsh[\s\S]*?(?=\n\s*\];\s*\})",
-            LevelDirectorGenerator.to_js_code(level),
-            content
-        )
-    else:
-        # Insert before the closing `];` of getLevels()
-        insertion = "\n,\n" + LevelDirectorGenerator.to_js_code(level) + "\n"
-        content = re.sub(r"(\n\s*\];\s*\})", insertion + r"\1", content)
-
-    with open(JS_LEVELS_PATH, "w", encoding="utf-8") as f:
-        f.write(content)
-
-    print(f"[OK] Successfully exported Level 5: Firefly Marsh directly into js/levels.js!")
-    print(f"Open http://localhost:3040 in your browser to play the newly generated level!")
+    with open(LEVELS_PATH, "r", encoding="utf-8") as f:
+        levels = json.load(f)
+    levels = [level if item.get("id") == 5 else item for item in levels]
+    with open(LEVELS_PATH, "w", encoding="utf-8") as f:
+        json.dump(levels, f, indent=2)
+        f.write("\n")
+    print(f"[OK] Successfully exported Level 5 to canonical level JSON.")
 
 def main():
     parser = argparse.ArgumentParser(description="Frog Game Level Intelligence with TypeSafe JEV System 1")
@@ -156,6 +139,7 @@ def main():
     p_sim.add_argument("level", type=int, nargs="?", default=1, help="Level number (default: 1)")
     p_sim.add_argument("--runs", type=int, default=100, help="Number of simulated playtests (default: 100)")
     p_sim.add_argument("--skill", choices=["novice", "casual", "pro"], default="casual", help="Simulated player skill")
+    p_sim.add_argument("--seed", type=int, default=1337, help="Random seed for reproducible results")
     p_sim.add_argument("--max-jumps", type=int, default=20, help="Max jumps to audit & simulate (default: 20)")
 
     # generate
@@ -166,7 +150,7 @@ def main():
     p_gen.add_argument("--export-json", help="Optional path to export JSON file")
 
     # export-level5
-    subparsers.add_parser("export-level5", help="Generate Level 5 and write it into js/levels.js")
+    subparsers.add_parser("export-level5", help="Generate Level 5 and write it into canonical level JSON")
 
     args = parser.parse_args()
     if args.command == "audit":

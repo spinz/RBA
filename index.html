@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Ribbit's Big Adventure - Deluxe Frog Platformer</title>
     <meta name="description" content="Play Ribbit's Big Adventure, a retro 16-bit platformer starring Ribbit the frog across enchanted swamp worlds.">
     <meta property="og:title" content="Ribbit's Big Adventure">
@@ -19,15 +19,25 @@
         window.onerror = function(msg, url, line, col, error) {
             const errStr = `[JS_ERROR] ${msg} at ${url}:${line}:${col}`;
             console.error(errStr);
-            fetch('/log_error?msg=' + encodeURIComponent(errStr)).catch(() => {});
+            fetch('/log_error', { method: 'POST', body: errStr }).catch(() => {});
         };
         const origErr = console.error;
         console.error = function(...args) {
             origErr.apply(console, args);
-            fetch('/log_error?msg=' + encodeURIComponent('[CONSOLE_ERR] ' + args.join(' '))).catch(() => {});
+            fetch('/log_error', { method: 'POST', body: '[CONSOLE_ERR] ' + args.join(' ') }).catch(() => {});
         };
     </script>
     <style>
+        :root {
+            --ink: #e8fff0;
+            --muted: #88a99a;
+            --panel: rgba(4, 22, 17, 0.92);
+            --panel-border: rgba(74, 222, 128, 0.38);
+            --accent: #4ade80;
+            --accent-strong: #22c55e;
+            --focus: #fde047;
+        }
+
         * {
             box-sizing: border-box;
             user-select: none;
@@ -55,11 +65,14 @@
             color: #f1f5f9;
             font-family: 'Press Start 2P', monospace, sans-serif;
             min-height: 100vh;
+            min-height: 100dvh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
+            gap: 10px;
+            overflow: auto;
+            padding: max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
         }
 
         #game-wrapper {
@@ -72,8 +85,10 @@
             border-radius: 12px;
             overflow: hidden;
             background: #000;
+            width: min(800px, calc(100vw - 20px));
+            aspect-ratio: 5 / 3;
             max-width: 100vw;
-            max-height: 100vh;
+            max-height: calc(100dvh - 150px);
             touch-action: none;
             overscroll-behavior: none;
         }
@@ -120,20 +135,44 @@
 
         /* Top control bar */
         #top-nav {
-            width: 100%;
-            max-width: 800px;
+            width: min(800px, calc(100vw - 20px));
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 8px 12px;
+            gap: 12px;
+            padding: 8px 10px;
             font-size: 11px;
             color: #86efac;
             letter-spacing: 1px;
+            background: var(--panel);
+            border: 1px solid var(--panel-border);
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+        }
+
+        .brand {
+            min-width: max-content;
+            color: var(--ink);
+            line-height: 1.25;
+        }
+
+        .brand small {
+            display: block;
+            margin-top: 3px;
+            color: var(--muted);
+            font-size: 6px;
+            letter-spacing: 1.5px;
         }
 
         .btn-group {
             display: flex;
+            justify-content: flex-start;
             gap: 8px;
+            min-width: 0;
+            overflow-x: auto;
+            padding: 3px;
+            scrollbar-width: thin;
+            scrollbar-color: #166534 transparent;
         }
 
         .action-btn {
@@ -146,6 +185,8 @@
             font-size: 9px;
             cursor: pointer;
             transition: all 0.15s ease;
+            white-space: nowrap;
+            flex: 0 0 auto;
         }
 
         .action-btn:hover {
@@ -159,35 +200,112 @@
             transform: translateY(1px);
         }
 
+        .action-btn:focus-visible {
+            outline: 3px solid var(--focus);
+            outline-offset: 2px;
+        }
+
+        .action-btn--boss {
+            background: #831843;
+            border-color: #fb7185;
+            color: #ffe4e6;
+        }
+
+        .action-btn--jev {
+            background: #047857;
+            border-color: #34d399;
+            color: #ecfdf5;
+        }
+
         /* Bottom instructions badge */
         #instructions {
-            margin-top: 10px;
-            font-size: 10px;
-            color: #64748b;
+            width: min(800px, calc(100vw - 20px));
+            font-size: 8px;
+            color: var(--muted);
             text-align: center;
             line-height: 1.6;
+            min-height: 16px;
         }
 
         #instructions span {
             color: #4ade4a;
         }
+
+        @media (max-width: 720px) {
+            body {
+                justify-content: flex-start;
+                gap: 8px;
+            }
+
+            #top-nav {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .brand small {
+                display: inline;
+                margin-left: 8px;
+            }
+
+            .btn-group {
+                justify-content: flex-start;
+            }
+
+            #instructions {
+                font-family: monospace, sans-serif;
+                font-size: 10px;
+            }
+        }
+
+        @media (max-height: 650px) and (orientation: landscape) {
+            body {
+                justify-content: flex-start;
+                gap: 5px;
+                padding-block: 5px;
+            }
+
+            #top-nav {
+                padding-block: 4px;
+            }
+
+            .brand small,
+            #instructions {
+                display: none;
+            }
+
+            #game-wrapper {
+                max-height: calc(100dvh - 62px);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                scroll-behavior: auto !important;
+                transition-duration: 0.01ms !important;
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+            }
+
+            #crt-overlay {
+                opacity: 0.25;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <div id="top-nav">
-        <div>RIBBIT'S BIG ADVENTURE (HD)</div>
-        <div class="btn-group">
-            <a href="/3d" class="action-btn" style="background:#0284c7; border-color:#38bdf8; color:#ffffff; font-weight:bold; text-decoration:none; display:inline-flex; align-items:center; gap:4px; box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);">3D DIORAMA</a>
-            <button class="action-btn" onclick="loadStage(0)" title="Lilypad Lagoon">S1</button>
-            <button class="action-btn" onclick="loadStage(1)" title="Cattail Canopy">S2</button>
-            <button class="action-btn" onclick="loadStage(2)" title="Mushroom Mire">S3</button>
-            <button class="action-btn" style="background:#831843; border-color:#f43f5e; color:#fecdd3; font-weight:bold;" onclick="loadStage(3)" title="The Sunken Citadel - Boss Stage">S4: BOSS</button>
-            <button class="action-btn" style="background:#047857; border-color:#34d399; color:#ecfdf5; font-weight:bold;" onclick="loadStage(4)" title="Firefly Marsh - JEV Generated">S5</button>
-            <button id="crt-toggle-btn" class="action-btn">CRT: ON</button>
-            <button id="fullscreen-btn" class="action-btn">FULLSCREEN</button>
+    <nav id="top-nav" aria-label="Game controls">
+        <div class="brand">RIBBIT'S BIG ADVENTURE <small>FIVE SWAMPS · ONE GOLDEN LOTUS</small></div>
+        <div class="btn-group" aria-label="Stage and display controls">
+            <button class="action-btn" onclick="loadStage(0)" title="Lilypad Lagoon" aria-label="Play stage 1, Lilypad Lagoon">01</button>
+            <button class="action-btn" onclick="loadStage(1)" title="Cattail Canopy" aria-label="Play stage 2, Cattail Canopy">02</button>
+            <button class="action-btn" onclick="loadStage(2)" title="Mushroom Mire" aria-label="Play stage 3, Mushroom Mire">03</button>
+            <button class="action-btn action-btn--boss" onclick="loadStage(3)" title="The Sunken Citadel" aria-label="Play stage 4 boss, The Sunken Citadel">04 BOSS</button>
+            <button class="action-btn action-btn--jev" onclick="loadStage(4)" title="Firefly Marsh" aria-label="Play stage 5, Firefly Marsh">05</button>
+            <button id="crt-toggle-btn" class="action-btn" aria-pressed="true" aria-label="Toggle CRT display effect">CRT ON</button>
+            <button id="fullscreen-btn" class="action-btn" aria-label="Toggle fullscreen">EXPAND</button>
         </div>
-    </div>
+    </nav>
 
     <div id="game-wrapper">
         <div id="game-canvas-container">
@@ -196,7 +314,7 @@
     </div>
 
     <div id="instructions">
-        <span>ARROWS / WASD</span> to Move &bull; <span>SPACE</span> to Jump (Hold for high leap) &bull; <span>X / SHIFT</span> for Tongue
+        <span>ARROWS / WASD</span> MOVE &bull; <span>SPACE</span> JUMP &bull; <span>X / SHIFT</span> TONGUE &bull; <span>P / ESC</span> PAUSE
     </div>
 
     <!-- Scripts -->
@@ -213,18 +331,21 @@
         // Quick Stage Select
         window.loadStage = function(index) {
             if (window.game && window.game.scene) {
+                const levels = window.LevelBuilder.getLevels();
+                const safeIndex = Math.max(0, Math.min(levels.length - 1, Number(index) || 0));
+                window.__rbaLevelQueryConsumed = true;
                 window.soundEngine.init();
                 window.soundEngine.stopBossMusic();
-                window.soundEngine.startMusic();
+                window.soundEngine.startMusic(safeIndex);
                 ['TitleScene', 'GameOverScene', 'VictoryScene', 'GameScene'].forEach(key => {
                     if (window.game.scene.isActive(key)) {
                         window.game.scene.stop(key);
                     }
                 });
                 window.game.scene.start('GameScene', {
-                    levelIndex: index,
-                    score: index * 1000,
-                    fireflies: index * 5
+                    levelIndex: safeIndex,
+                    score: 0,
+                    fireflies: 0
                 });
             }
         };
@@ -252,7 +373,13 @@
         crtBtn.addEventListener('click', () => {
             crtActive = !crtActive;
             crtOverlay.style.display = crtActive ? 'block' : 'none';
-            crtBtn.textContent = crtActive ? 'CRT: ON' : 'CRT: OFF';
+            crtBtn.textContent = crtActive ? 'CRT ON' : 'CRT OFF';
+            crtBtn.setAttribute('aria-pressed', String(crtActive));
+        });
+
+        document.addEventListener('fullscreenchange', () => {
+            const isFullscreen = Boolean(document.fullscreenElement);
+            document.getElementById('fullscreen-btn').textContent = isFullscreen ? 'EXIT' : 'EXPAND';
         });
     </script>
 </body>

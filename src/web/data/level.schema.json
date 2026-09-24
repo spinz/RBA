@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "rba://schemas/level.schema.json",
+  "$defs": {
+    "point": {
+      "type": "object",
+      "required": ["x", "y"],
+      "properties": { "x": { "type": "number" }, "y": { "type": "number" } },
+      "additionalProperties": true
+    },
+    "rect": {
+      "type": "object",
+      "required": ["x", "y", "w", "h"],
+      "properties": { "x": { "type": "number" }, "y": { "type": "number" }, "w": { "type": "number", "exclusiveMinimum": 0 }, "h": { "type": "number", "exclusiveMinimum": 0 } },
+      "additionalProperties": true
+    },
+    "platform": {
+      "allOf": [{ "$ref": "#/$defs/rect" }, { "required": ["type"] }]
+    },
+    "enemy": {
+      "type": "object",
+      "required": ["x", "y"],
+      "properties": { "x": { "type": "number" }, "y": { "type": "number" } },
+      "additionalProperties": true
+    }
+  },
+  "type": "array",
+  "minItems": 5,
+  "items": {
+    "type": "object",
+    "required": ["id", "name", "width", "height", "playerStart", "platforms", "goal"],
+    "properties": {
+      "id": { "type": "integer", "minimum": 1 },
+      "name": { "type": "string", "minLength": 1 },
+      "width": { "type": "number", "exclusiveMinimum": 0 },
+      "height": { "type": "number", "exclusiveMinimum": 0 },
+      "playerStart": { "$ref": "#/$defs/point" },
+      "platforms": { "type": "array", "items": { "$ref": "#/$defs/platform" } },
+      "goal": { "$ref": "#/$defs/point" },
+      "boss": { "$ref": "#/$defs/point" },
+      "arenaGate": { "$ref": "#/$defs/point" },
+      "waterPits": { "type": "array", "items": { "$ref": "#/$defs/rect" } },
+      "fireflies": { "type": "array", "items": { "$ref": "#/$defs/point" } },
+      "goldenLotus": { "type": "array", "items": { "$ref": "#/$defs/point" } },
+      "lilypads": { "type": "array", "items": { "$ref": "#/$defs/point" } },
+      "mushrooms": { "type": "array", "items": { "$ref": "#/$defs/point" } },
+      "beetles": { "type": "array", "items": { "$ref": "#/$defs/enemy" } },
+      "mosquitoes": { "type": "array", "items": { "$ref": "#/$defs/enemy" } }
+    },
+    "$defs": {
+      "point": {
+        "type": "object",
+        "required": ["x", "y"],
+        "properties": { "x": { "type": "number" }, "y": { "type": "number" } },
+        "additionalProperties": true
+      },
+      "rect": {
+        "type": "object",
+        "required": ["x", "y", "w", "h"],
+        "properties": { "x": { "type": "number" }, "y": { "type": "number" }, "w": { "type": "number", "exclusiveMinimum": 0 }, "h": { "type": "number", "exclusiveMinimum": 0 } },
+        "additionalProperties": true
+      },
+      "platform": {
+        "allOf": [{ "$ref": "#/$defs/rect" }, { "required": ["type"] }]
+      },
+      "enemy": {
+        "type": "object",
+        "required": ["x", "y"],
+        "properties": { "x": { "type": "number" }, "y": { "type": "number" } },
+        "additionalProperties": true
+      }
+    }
+  }
+}

@@ -3,7 +3,9 @@ const fs = require('fs');
 const path = require('path');
 
 const PORT = parseInt(process.env.PORT, 10) || 3050;
-const PUBLIC_DIR = __dirname;
+const HOST = process.env.HOST || '127.0.0.1';
+const PUBLIC_DIR = path.join(__dirname, 'dist');
+const MAX_LOG_BYTES = 4096;
 
 const MIME_TYPES = {
     '.html': 'text/html; charset=utf-8',
@@ -19,29 +21,48 @@ const MIME_TYPES = {
 };
 
 const server = http.createServer((req, res) => {
-    // Parse URL
-    const parsedUrl = new URL(req.url, `http://${req.headers.host}`);
-    let pathname = decodeURIComponent(parsedUrl.pathname);
+    let parsedUrl;
+    let pathname;
+    try {
+        parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+        pathname = decodeURIComponent(parsedUrl.pathname);
+    } catch {
+        res.writeHead(400, { 'Content-Type': 'text/plain; charset=utf-8' });
+        res.end('400 Bad Request');
+        return;
+    }
 
-    // Logging endpoint
-    if (pathname === '/log_error') {
-        const msg = parsedUrl.searchParams.get('msg') || '';
-        console.log(`[CLIENT_LOG] ${msg}`);
-        res.writeHead(200, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
-        res.end('OK');
+    // Small, local-only client error sink. Never writes logs to disk.
+    if (pathname === '/log_error' && req.method === 'POST') {
+        let body = '';
+        req.setEncoding('utf8');
+        req.on('data', chunk => {
+            body += chunk;
+            if (Buffer.byteLength(body, 'utf8') > MAX_LOG_BYTES) req.destroy();
+        });
+        req.on('end', () => {
+            const message = body.replace(/[\r\n\u0000-\u001f]+/g, ' ').slice(0, MAX_LOG_BYTES);
+            console.warn(`[CLIENT_LOG] ${message}`);
+            res.writeHead(204, { 'Cache-Control': 'no-store' });
+            res.end();
+        });
         return;
     }
 
     if (pathname === '/') {
         pathname = '/index.html';
     }
-    if (pathname === '/3d') {
-        pathname = '/3d.html';
-    }
+    const relativePath = path.posix.normalize(pathname).replace(/^\/+/, '');
+    const pathParts = relativePath.split('/');
+    const safePath = path.resolve(PUBLIC_DIR, ...pathParts);
+    const relativeToPublic = path.relative(PUBLIC_DIR, safePath);
 
-    // Safe path traversal check
-    const safePath = path.normalize(path.join(PUBLIC_DIR, pathname));
-    if (!safePath.startsWith(PUBLIC_DIR)) {
+    // Refuse traversal, dotfiles, and anything outside the generated web root.
+    if (
+        relativeToPublic.startsWith('..') ||
+        path.isAbsolute(relativeToPublic) ||
+        pathParts.some(part => part.startsWith('.'))
+    ) {
         res.writeHead(403, { 'Content-Type': 'text/plain' });
         res.end('403 Forbidden');
         return;
@@ -69,6 +90,10 @@ const server = http.createServer((req, res) => {
     });
 });
 
-server.listen(PORT, '0.0.0.0', () => {
-    console.log(`Ribbit's Big Adventure running at http://0.0.0.0:${PORT}`);
-});
+if (require.main === module) {
+    server.listen(PORT, HOST, () => {
+        console.log(`Ribbit's Big Adventure running at http://${HOST}:${PORT}`);
+    });
+}
+
+module.exports = { server };

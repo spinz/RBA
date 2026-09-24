@@ -42,14 +42,26 @@ def get_typesafe_api_key() -> str:
 class JevEngine:
     def __init__(self, api_key: Optional[str] = None):
         self.api_key = api_key or get_typesafe_api_key()
-        if not self.api_key:
-            raise ValueError("TYPESAFE_API_KEY not found in environment, ~/.env, or ~/.hermes/.env")
+        self.offline = not self.api_key
 
     def decide(self, state: str, questions: Dict[str, Any], model: str = "jev-latest") -> Dict[str, Any]:
         """
         Queries TypeSafe's System 1 non-autoregressive decision model.
         Returns the parsed answers dictionary and usage metadata.
         """
+        if self.offline:
+            answers = {}
+            for key, question in questions.items():
+                if question.get("type") == "choice":
+                    criteria = question.get("criteria", {})
+                    first_choice = next(iter(criteria), "UNKNOWN") if isinstance(criteria, dict) else "UNKNOWN"
+                    answers[key] = {"choice": first_choice, "probabilities": {first_choice: 1.0}}
+                elif question.get("type") == "score":
+                    answers[key] = {"score": 1.0}
+                else:
+                    answers[key] = {"noul": 0.0}
+            return {"answers": answers, "metadata": {"mode": "offline-deterministic"}}
+
         headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json"

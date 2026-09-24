@@ -1,5 +1,4 @@
 import json
-import re
 from typing import Dict, Any, List, Optional
 from .physics_model import RibbitPhysics
 from .jev_client import JevEngine
@@ -13,32 +12,15 @@ class LevelAuditor:
         self.jev = jev or JevEngine()
 
     @staticmethod
-    def parse_js_levels(js_file_path: str) -> List[Dict[str, Any]]:
-        """
-        Parses LevelBuilder.getLevels() from frog-game/js/levels.js into Python dictionaries.
-        """
-        with open(js_file_path, "r", encoding="utf-8") as f:
-            content = f.read()
+    def parse_level_data(levels_path: str) -> List[Dict[str, Any]]:
+        """Load the canonical JSON consumed by the web runtime."""
+        with open(levels_path, "r", encoding="utf-8") as f:
+            levels = json.load(f)
+        if not isinstance(levels, list):
+            raise ValueError("Canonical level data must be a JSON array.")
+        return levels
 
-        # Extract the array inside getLevels() { return [ ... ]; }
-        match = re.search(r"static\s+getLevels\s*\(\)\s*\{\s*return\s*(\[[\s\S]*?\]);\s*\}", content)
-        if not match:
-            raise ValueError("Could not find getLevels() array in JS file.")
-
-        raw_js = match.group(1)
-        
-        # Clean JS object notation into parseable JSON
-        # 1. Remove comments
-        clean = re.sub(r"//.*", "", raw_js)
-        clean = re.sub(r"/\*[\s\S]*?\*/", "", clean)
-        # 2. Quote unquoted keys (e.g., id: -> "id":)
-        clean = re.sub(r"([{,]\s*)([a-zA-Z_][a-zA-Z0-9_]*)\s*:", r'\1"\2":', clean)
-        # 3. Replace single quotes with double quotes
-        clean = clean.replace("'", '"')
-        # 4. Remove trailing commas
-        clean = re.sub(r",\s*([\]}])", r"\1", clean)
-
-        return json.loads(clean)
+    parse_js_levels = parse_level_data
 
     def audit_level(self, level: Dict[str, Any], max_jumps_to_audit: int = 8) -> Dict[str, Any]:
         """
@@ -70,7 +52,7 @@ class LevelAuditor:
                 "x": lp["x"],
                 "y": lp["y"],
                 "w": 56, # standard lilypad width
-                "h": 16,
+                "h": 12,
                 "desc": "Floating Lilypad"
             })
 

@@ -1,0 +1,12 @@
+{
+  "gravity": 1000,
+  "runSpeed": 200,
+  "acceleration": 1450,
+  "drag": 1150,
+  "jumpVelocity": -440,
+  "springVelocity": -640,
+  "tongueReach": 135,
+  "tongueSpeed": 480,
+  "coyoteTimeMs": 120,
+  "jumpBufferMs": 130
+}

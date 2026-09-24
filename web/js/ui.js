@@ -11,6 +11,7 @@ class GameUI {
 
         this.initHUD();
         this.initTouchControls();
+        this.initPauseOverlay();
     }
 
     initHUD() {
@@ -83,9 +84,18 @@ class GameUI {
 
     addFirefly() {
         this.fireflies++;
+        this.renderFireflies();
+        this.addScore(50);
+    }
+
+    setFireflies(amount) {
+        this.fireflies = Math.max(0, Number(amount) || 0);
+        this.renderFireflies();
+    }
+
+    renderFireflies() {
         const formatted = String(this.fireflies).padStart(2, '0');
         this.ffText.setText(`x ${formatted}`);
-        this.addScore(50);
     }
 
     showScorePopup(x, y, text, color = '#fde047') {
@@ -231,6 +241,37 @@ class GameUI {
         }
     }
 
+    initPauseOverlay() {
+        const w = this.scene.scale.width;
+        const h = this.scene.scale.height;
+        this.pauseContainer = this.scene.add.container(w / 2, h / 2)
+            .setScrollFactor(0)
+            .setDepth(1000)
+            .setVisible(false);
+
+        const backdrop = this.scene.add.rectangle(0, 0, w, h, 0x020617, 0.78)
+            .setInteractive({ useHandCursor: true });
+        const panel = this.scene.add.rectangle(0, 0, 360, 150, 0x052e16, 0.96)
+            .setStrokeStyle(3, 0x4ade80, 1);
+        const title = this.scene.add.text(0, -30, 'PAUSED', {
+            fontFamily: '"Press Start 2P", monospace, sans-serif',
+            fontSize: '28px',
+            color: '#f0fdf4'
+        }).setOrigin(0.5);
+        const hint = this.scene.add.text(0, 30, 'P / ESC OR TAP TO RESUME', {
+            fontFamily: '"Press Start 2P", monospace, sans-serif',
+            fontSize: '10px',
+            color: '#86efac'
+        }).setOrigin(0.5);
+
+        backdrop.on('pointerdown', () => this.scene.togglePause(false));
+        this.pauseContainer.add([backdrop, panel, title, hint]);
+    }
+
+    setPaused(isPaused) {
+        if (this.pauseContainer) this.pauseContainer.setVisible(isPaused);
+    }
+
     initTouchControls() {
         // Virtual Touch Controls for Mobile / Tablets
         this.touchInputs = {
@@ -240,9 +281,10 @@ class GameUI {
             tongue: false
         };
 
-        const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-        // Only show if mobile/tablet or window width is narrow
-        if (!isTouchDevice && window.innerWidth > 900) return;
+        const hasCoarsePointer = window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+        const isNarrowTouchScreen = window.innerWidth <= 720 && navigator.maxTouchPoints > 0;
+        const isTouchDevice = hasCoarsePointer || isNarrowTouchScreen;
+        if (!isTouchDevice) return;
 
         const touchContainer = this.scene.add.container(0, 0).setScrollFactor(0).setDepth(100);
 
@@ -254,7 +296,8 @@ class GameUI {
 
             const txt = this.scene.add.text(x, y, label, {
                 fontFamily: 'sans-serif',
-                fontSize: `${radius * 0.9}px`,
+                fontSize: `${radius * 0.62}px`,
+                fontStyle: 'bold',
                 color: '#ffffff'
             }).setOrigin(0.5);
 
@@ -278,23 +321,23 @@ class GameUI {
         const screenW = this.scene.scale.width;
 
         // D-Pad Left / Right
-        makeBtn(70, screenH - 60, 32, '<', 0x334155,
+        makeBtn(70, screenH - 66, 46, '<', 0x334155,
             () => this.touchInputs.left = true,
             () => this.touchInputs.left = false
         );
-        makeBtn(145, screenH - 60, 32, '>', 0x334155,
+        makeBtn(170, screenH - 66, 46, '>', 0x334155,
             () => this.touchInputs.right = true,
             () => this.touchInputs.right = false
         );
 
         // Action B (Tongue)
-        makeBtn(screenW - 130, screenH - 60, 30, 'LASH', 0xec4899,
+        makeBtn(screenW - 170, screenH - 66, 46, 'LASH', 0xec4899,
             () => this.touchInputs.tongue = true,
             () => this.touchInputs.tongue = false
         );
 
         // Action A (Jump)
-        makeBtn(screenW - 60, screenH - 60, 36, '^', 0x22c55e,
+        makeBtn(screenW - 65, screenH - 66, 50, '^', 0x22c55e,
             () => this.touchInputs.jump = true,
             () => this.touchInputs.jump = false
         );
