@@ -84,3 +84,9 @@ The Godot project is currently a movement prototype and should remain labelled t
 - The current stage-selection strip remains useful for development but bypasses campaign progression.
 - The next visual pass needs an art bible, asset-size conventions, animation lists, and an atlas-loading pipeline before replacing placeholders.
 - The Godot prototype uses different movement constants and has no campaign, combat, persistence, or level-loader parity yet.
+
+## Phase 6 — objective HUD slice
+
+- Added a compact fixed HUD objective for every stage, with local firefly progress shown separately from the carried campaign total.
+- Boss stages now identify the King Croaker objective before the encounter begins; shrine stages identify the goal shrine.
+- Added static regression guards for objective HUD wiring.

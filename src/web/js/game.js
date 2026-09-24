@@ -338,6 +338,10 @@ class GameScene extends Phaser.Scene {
         this.ui.score = this.carriedScore;
         this.ui.addScore(0);
         this.ui.setFireflies(this.carriedFireflies);
+        this.ui.setObjective(
+            this.currentLevel.boss ? 'DEFEAT KING CROAKER' : 'REACH THE GOLDEN SHRINE',
+            this.currentLevel.fireflies?.length || 0
+        );
         this.ui.showLevelBanner(`LEVEL ${this.currentLevel.id}: ${this.currentLevel.name}`);
         this.setupTutorial();
 

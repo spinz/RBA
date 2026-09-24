@@ -52,6 +52,11 @@ for (const setting of ['reducedFlashing', 'screenShake', 'touchOpacity']) {
 for (const tutorialText of ['MOVE WITH A / D', 'PRESS X OR SHIFT', 'TUTORIAL COMPLETE']) {
     if (!gameSource.includes(tutorialText)) failures.push(`game.js: missing onboarding prompt ${tutorialText}`);
 }
+const uiSource = fs.readFileSync(path.join(sourceRoot, 'js', 'ui.js'), 'utf8');
+for (const objectiveGuard of ['setObjective', 'renderObjective', 'FIREFLIES']) {
+    if (!uiSource.includes(objectiveGuard)) failures.push(`ui.js: missing objective HUD guard ${objectiveGuard}`);
+}
+if (!gameSource.includes('this.ui.setObjective(')) failures.push('game.js: missing stage objective wiring');
 for (const bossGuard of ['this.arenaTransitioning = true', 'startBossEncounter', 'spawnVictoryLotus(this.x, this.y - 28)']) {
     const source = bossGuard.startsWith('spawn') ? fs.readFileSync(path.join(sourceRoot, 'js', 'enemies.js'), 'utf8') : gameSource;
     if (!source.includes(bossGuard)) failures.push(`boss flow: missing regression guard ${bossGuard}`);

@@ -27,6 +27,15 @@ class GameUI {
         topBar.fillRoundedRect(10, 10, 520, 42, 8);
         this.container.add(topBar);
 
+        this.objectiveText = this.scene.add.text(20, 58, '', {
+            fontFamily: '"Press Start 2P", monospace, sans-serif',
+            fontSize: '9px',
+            color: '#d1fae5',
+            stroke: '#022c22',
+            strokeThickness: 2
+        });
+        this.container.add(this.objectiveText);
+
         // 1. Health Hearts
         for (let i = 0; i < 3; i++) {
             const heart = this.scene.add.image(30 + i * 24, 30, 'heart').setScale(1.3);
@@ -68,6 +77,21 @@ class GameUI {
         this.container.add(this.muteBtn);
     }
 
+    setObjective(message, totalFireflies = 0) {
+        this.objective = message;
+        this.stageFireflyTotal = Math.max(0, Number(totalFireflies) || 0);
+        this.stageFireflies = 0;
+        this.renderObjective();
+    }
+
+    renderObjective() {
+        if (!this.objectiveText) return;
+        const progress = this.stageFireflyTotal > 0
+            ? `  FIREFLIES ${this.stageFireflies}/${this.stageFireflyTotal}`
+            : '';
+        this.objectiveText.setText(`OBJECTIVE: ${this.objective || 'EXPLORE THE SWAMP'}${progress}`);
+    }
+
     updateHealth(hp) {
         for (let i = 0; i < 3; i++) {
             if (i < hp) {
@@ -92,6 +116,8 @@ class GameUI {
 
     addFirefly() {
         this.fireflies++;
+        this.stageFireflies = Math.min(this.stageFireflyTotal, this.stageFireflies + 1);
+        this.renderObjective();
         this.renderFireflies();
         this.addScore(50);
         this.announce(`Firefly collected. ${this.fireflies} carried.`);
