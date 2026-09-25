@@ -1,5 +1,4 @@
 import os
-import requests
 from typing import Dict, Any, Optional
 
 OFFICIAL_TYPESAFE_URL = "https://api.typesafe.ai/v1/systemone"
@@ -41,7 +40,7 @@ def get_typesafe_api_key() -> str:
 
 class JevEngine:
     def __init__(self, api_key: Optional[str] = None):
-        self.api_key = api_key or get_typesafe_api_key()
+        self.api_key = get_typesafe_api_key() if api_key is None else api_key
         self.offline = not self.api_key
 
     def decide(self, state: str, questions: Dict[str, Any], model: str = "jev-latest") -> Dict[str, Any]:
@@ -61,6 +60,8 @@ class JevEngine:
                 else:
                     answers[key] = {"noul": 0.0}
             return {"answers": answers, "metadata": {"mode": "offline-deterministic"}}
+
+        import requests  # Optional dependency, only needed for explicitly enabled API use.
 
         headers = {
             "Authorization": f"Bearer {self.api_key}",

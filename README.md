@@ -2,7 +2,8 @@
 
 ![Ribbit's Big Adventure Banner](docs/images/rba_banner.png)
 
-A high-performance retro platformer starring Ribbit the frog, built with multi-platform game engines and backed by autonomous AI level-design intelligence.
+A 2D browser platformer starring Ribbit the frog, with a five-stage Phaser campaign,
+procedural art/audio, and optional offline level-analysis tools.
 
 ---
 
@@ -46,13 +47,20 @@ edit them. The Python level-intelligence tools under `web/tools/` remain active.
 - **2D Web Tongue Attack**: `X` / `Shift`
 - **Godot Prototype Attack**: `J` / `X` / `Enter`
 - **Pause (2D Web)**: `P` / `Escape`
+- **Restart stage (2D Web)**: `R` or the Retry button (also works while paused)
+
+New Adventure resets the active run while keeping records, unlocked stages and
+settings. Continue resumes the saved stage checkpoint, or the ending for a
+completed run. Death and retry restore the stage-start score and fireflies.
+Settings and the stage map support keyboard and touch. Audio starts after a user
+gesture; mute, pause and backgrounding preserve the intended soundtrack.
 
 ---
 
 ## Autonomous Level Intelligence (JEV)
 
 Levels in Ribbit's Big Adventure are verified by an autonomous AI game design and QA framework located in `web/tools/level_intelligence`:
-- **Kinematic Jump Modeling**: Simulates exact parabolic jump curves, terminal velocity, and horizontal momentum to guarantee every platform distance is mathematically reachable.
+- **Kinematic Jump Modeling**: Estimates candidate jump reachability from shared movement constants. This heuristic does not replace collision-aware route testing or human playtests.
 - **Monte Carlo Playtesting**: Runs hundreds of automated playthroughs per level to surface rage-quit gaps, unfair vertical ascents, or blind falls.
 - **Procedural Generation**: Algorithmically generates balanced level stages based on cadence, recovery ledges, and difficulty curves.
 
@@ -60,14 +68,16 @@ Levels in Ribbit's Big Adventure are verified by an autonomous AI game design an
 
 ## Art Pipeline & Graphical Overhaul Roadmap
 
-Ribbit's Big Adventure is currently undergoing a full graphical overhaul leveraging local AI generation workflows via **ComfyUI** and **Qwen Image 2.1**:
+The shipped game currently uses procedural 2D art. The production-asset pass is
+still planned and should preserve the existing collision geometry and timing:
 
 - **Sprite Sheets**: High-detail 48x48 and 64x64 multi-frame animation sheets for Ribbit (idle, throat puff, leap, apex tuck, land, dive, tongue lash).
 - **Environment Tilesets**: Distinct thematic tilesets for mossy mud banks, hollowed cypress logs, bioluminescent fungi, and moss-draped masonry.
 - **Multi-Layer Parallax Backgrounds**: Multi-plane atmospheric backdrops featuring distant canopy silhouettes, drifting swamp mist, and glowing firefly particles.
 - **Boss Entities**: Multi-phase swamp leviathan and boss monster sprites with directional telegraph animations.
 
-Workflows and generated sprite sheets will be deposited into the asset directories as rendering passes conclude.
+An art bible, asset manifest, atlas validation, and provenance records are required
+before these replacements can be marked complete.
 
 ---
 
@@ -147,6 +157,9 @@ npm run test:e2e
 The browser test runs against `dist/`. All required validation runs without AI
 credentials. See [CONTRIBUTING.md](CONTRIBUTING.md) for source ownership and
 the current scope of JavaScript type checking.
+
+See [the project review](docs/PROJECT_REVIEW.md) for the reproduced boss-crash fix,
+campaign/audio regression coverage, screenshot checks, and honest roadmap status.
 
 ### Running the Godot 4 Edition
 Requirements: Godot 4.x installed on your system.

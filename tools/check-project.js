@@ -25,7 +25,6 @@ for (const required of ['game-canvas-container', 'crt-toggle-btn', 'fullscreen-b
 
 const gameplayChecks = [
     ['enemies.js', "if (this.body.velocity.y >= 0)"],
-    ['enemies.js', 'this.shockwaves.splice(i, 1)'],
     ['player.js', 'this.tongueTip.body.enable = false'],
     ['game.js', 'this.wasd.up.isDown']
 ];
@@ -57,7 +56,7 @@ for (const objectiveGuard of ['setObjective', 'renderObjective', 'FIREFLIES']) {
     if (!uiSource.includes(objectiveGuard)) failures.push(`ui.js: missing objective HUD guard ${objectiveGuard}`);
 }
 if (!gameSource.includes('this.ui.setObjective(')) failures.push('game.js: missing stage objective wiring');
-for (const bossGuard of ['this.arenaTransitioning = true', 'startBossEncounter', 'spawnVictoryLotus(this.x, this.y - 28)']) {
+for (const bossGuard of ['this.arenaTransitioning = true', 'startBossEncounter']) {
     const source = bossGuard.startsWith('spawn') ? fs.readFileSync(path.join(sourceRoot, 'js', 'enemies.js'), 'utf8') : gameSource;
     if (!source.includes(bossGuard)) failures.push(`boss flow: missing regression guard ${bossGuard}`);
 }

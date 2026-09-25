@@ -38,6 +38,9 @@ class TitleScene extends Phaser.Scene {
     }
 
     create() {
+        this.reducedMotion = Boolean(StorageManager.load().profile.settings.reducedMotion);
+        window.soundEngine.setPaused(false);
+        window.soundEngine.setTrack('title');
         const w = this.scale.width;
         const h = this.scale.height;
 
@@ -72,7 +75,7 @@ class TitleScene extends Phaser.Scene {
         titleBox.add([titleShadow, titleText]);
 
         // Floating Title Tween
-        this.tweens.add({
+        if (!this.reducedMotion) this.tweens.add({
             targets: titleBox,
             y: 135,
             duration: 1800,
@@ -86,7 +89,7 @@ class TitleScene extends Phaser.Scene {
         const frog = this.add.sprite(w / 2, 260, 'frog', 0).setScale(2);
 
         // Frog throat puff animation
-        this.anims.create({
+        if (!this.anims.exists('title_frog_croak')) this.anims.create({
             key: 'title_frog_croak',
             frames: this.anims.generateFrameNumbers('frog', { frames: [0, 1] }),
             frameRate: 2,
@@ -100,7 +103,7 @@ class TitleScene extends Phaser.Scene {
             const ry = Phaser.Math.Between(40, h - 80);
             const ff = this.add.sprite(rx, ry, 'firefly', 0).setScale(1.3);
             ff.play('firefly_glow');
-            this.tweens.add({
+            if (!this.reducedMotion) this.tweens.add({
                 targets: ff,
                 y: ry + Phaser.Math.Between(-25, 25),
                 x: rx + Phaser.Math.Between(-30, 30),
@@ -120,7 +123,11 @@ class TitleScene extends Phaser.Scene {
         this.menuItems = [];
         const begin = (levelIndex, fresh = false) => {
             window.soundEngine.init();
-            const current = fresh ? StorageManager.reset() : StorageManager.load();
+            const current = fresh ? StorageManager.newRun() : StorageManager.load();
+            if (!fresh && current.run.completed) {
+                this.scene.start('VictoryScene', { score: current.run.score, fireflies: current.run.carriedFireflies });
+                return;
+            }
             const score = fresh ? 0 : current.run.score;
             const fireflies = fresh ? 0 : current.run.carriedFireflies;
             StorageManager.save({ currentStage: levelIndex, score, fireflies, startOfStageScore: score, startOfStageFireflies: fireflies });
@@ -144,8 +151,8 @@ class TitleScene extends Phaser.Scene {
         });
         addMenuItem('NEW ADVENTURE', 390, () => {
             const current = StorageManager.load();
-            const hasProgress = current.profile.unlockedStage > 0 || current.profile.bestScore > 0 || current.profile.bestFireflyCount > 0;
-            if (!hasProgress || window.confirm('Start a new adventure and reset your saved progress?')) begin(0, true);
+            const hasProgress = current.run.currentStage > 0 || current.run.score > 0;
+            if (!hasProgress || window.confirm('Start a new adventure? Your records, unlocked stages and settings will be kept.')) begin(0, true);
         });
         addMenuItem('STAGE MAP', 425, () => this.showStageMap());
         addMenuItem('SETTINGS', 460, () => this.showSettings());
@@ -153,14 +160,15 @@ class TitleScene extends Phaser.Scene {
         this.updateMenuFocus();
         this.input.keyboard.on('keydown-UP', () => this.moveMenu(-1));
         this.input.keyboard.on('keydown-DOWN', () => this.moveMenu(1));
-        this.input.keyboard.on('keydown-ENTER', () => this.menuItems[this.menuIndex].callback());
-        this.input.keyboard.on('keydown-SPACE', () => this.menuItems[this.menuIndex].callback());
+        this.input.keyboard.on('keydown-ENTER', () => { if (!this.menuDialog?.open) this.menuItems[this.menuIndex].callback(); });
+        this.input.keyboard.on('keydown-SPACE', () => { if (!this.menuDialog?.open) this.menuItems[this.menuIndex].callback(); });
         this.add.text(w / 2, h - 28, 'ARROWS/WASD: MOVE  |  SPACE: JUMP  |  X / SHIFT: TONGUE', {
             fontFamily: '"Press Start 2P", monospace, sans-serif', fontSize: '10px', color: '#a7f3d0'
         }).setOrigin(0.5);
     }
 
     moveMenu(delta) {
+        if (this.menuDialog?.open) return;
         this.menuIndex = (this.menuIndex + delta + this.menuItems.length) % this.menuItems.length;
         this.updateMenuFocus();
     }
@@ -169,102 +177,97 @@ class TitleScene extends Phaser.Scene {
         this.menuItems.forEach((entry, index) => entry.item.setColor(index === this.menuIndex ? '#ffffff' : '#fef08a'));
     }
 
+    openDialog(title) {
+        if (this.menuDialog?.open) return null;
+        const dialog = document.createElement('dialog');
+        dialog.className = 'game-dialog';
+        const heading = document.createElement('h2');
+        heading.id = 'game-dialog-title';
+        heading.textContent = title;
+        heading.tabIndex = -1;
+        dialog.setAttribute('aria-labelledby', heading.id);
+        dialog.append(heading);
+        const close = document.createElement('button');
+        close.textContent = 'Back to menu';
+        close.addEventListener('click', () => dialog.close());
+        dialog.append(close);
+        dialog.addEventListener('keydown', event => event.stopPropagation());
+        dialog.addEventListener('keyup', event => event.stopPropagation());
+        const cleanup = () => {
+            dialog.remove();
+            this.menuDialog = null;
+            this.input.keyboard.resetKeys();
+        };
+        dialog.addEventListener('close', cleanup, { once: true });
+        this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => dialog.remove());
+        document.getElementById('game-wrapper').append(dialog);
+        this.menuDialog = dialog;
+        dialog.showModal();
+        heading.focus();
+        return { dialog, close };
+    }
+
     showStageMap() {
+        const panel = this.openDialog('Stage map');
+        if (!panel) return;
         const save = StorageManager.load();
-        const levels = window.LevelBuilder.getLevels();
-        const panel = this.add.container(this.scale.width / 2, 260).setDepth(20);
-        const backdrop = this.add.rectangle(0, 0, 570, 390, 0x022c22, 0.97).setStrokeStyle(3, 0x4ade80, 1);
-        panel.add(backdrop);
-        panel.add(this.add.text(0, -160, 'STAGE MAP', {
-            fontFamily: '"Press Start 2P", monospace, sans-serif', fontSize: '18px', color: '#fef08a'
-        }).setOrigin(0.5));
-        levels.forEach((level, index) => {
-            const unlocked = index <= save.profile.unlockedStage;
-            const item = this.add.text(-220, -110 + index * 42, `${unlocked ? '▶' : '🔒'}  ${index + 1}. ${level.name}`, {
-                fontFamily: '"Press Start 2P", monospace, sans-serif', fontSize: '12px',
-                color: unlocked ? '#d1fae5' : '#64748b', padding: { left: 8, right: 8, top: 6, bottom: 6 }
+        window.LevelBuilder.getLevels().forEach((level, index) => {
+            const button = document.createElement('button');
+            button.disabled = index > save.profile.unlockedStage;
+            button.textContent = `${index + 1}. ${level.name}${button.disabled ? ' — Locked' : ''}`;
+            button.addEventListener('click', () => {
+                panel.dialog.close();
+                window.soundEngine.init();
+                // Stage selection starts a standalone attempt, without importing
+                // points from a later stage into an earlier one.
+                this.scene.start('GameScene', { levelIndex: index, score: 0, fireflies: 0 });
             });
-            if (unlocked) {
-                item.setInteractive({ useHandCursor: true });
-                item.on('pointerover', () => item.setColor('#ffffff'));
-                item.on('pointerout', () => item.setColor('#d1fae5'));
-                item.on('pointerdown', () => {
-                    StorageManager.save({ currentStage: index });
-                    window.soundEngine.init();
-                    window.soundEngine.startMusic(index);
-                    panel.destroy();
-                    this.scene.start('GameScene', { levelIndex: index, score: save.run.score, fireflies: save.run.carriedFireflies });
-                });
-            }
-            panel.add(item);
+            panel.dialog.insertBefore(button, panel.close);
         });
-        panel.add(this.add.text(0, 155, 'SELECT A STAGE  ·  ESC TO CLOSE', {
-            fontFamily: '"Press Start 2P", monospace, sans-serif', fontSize: '10px', color: '#86efac'
-        }).setOrigin(0.5));
-        const close = () => { panel.destroy(); this.input.keyboard.off('keydown-ESC', close); };
-        this.input.keyboard.once('keydown-ESC', close);
     }
 
     showSettings() {
-        const save = StorageManager.load();
-        const reduced = Boolean(save.profile.settings.reducedMotion);
-        const flashing = Boolean(save.profile.settings.reducedFlashing);
-        const shake = save.profile.settings.screenShake !== false;
-        const muted = Boolean(save.profile.settings.muted);
-        const touchOpacity = Number(save.profile.settings.touchOpacity) || 0.55;
-        const panel = this.add.text(this.scale.width / 2, 270, `SETTINGS\n\nREDUCED MOTION: ${reduced ? 'ON' : 'OFF'}\nREDUCED FLASHING: ${flashing ? 'ON' : 'OFF'}\nSCREEN SHAKE: ${shake ? 'ON' : 'OFF'}\nSOUND: ${muted ? 'OFF' : 'ON'}\nTOUCH OPACITY: ${Math.round(touchOpacity * 100)}%\n\nR MOTION  F FLASH  S SHAKE\nM SOUND  T TOUCH  ESC CLOSE`, {
-            fontFamily: '"Press Start 2P", monospace, sans-serif', fontSize: '12px', color: '#d1fae5',
-            backgroundColor: '#022c22', padding: { left: 20, right: 20, top: 16, bottom: 16 }, align: 'center', lineSpacing: 8
-        }).setOrigin(0.5).setDepth(20);
-        const toggle = () => {
-            const next = !Boolean(StorageManager.load().profile.settings.reducedMotion);
-            StorageManager.save({ settings: { reducedMotion: next } });
-            const current = StorageManager.load().profile.settings;
-            panel.setText(this.settingsSummary({ ...current, reducedMotion: next }));
-        };
-        const soundToggle = () => {
-            window.soundEngine.toggleMute();
-            panel.setText(this.settingsSummary(StorageManager.load().profile.settings));
-        };
-        const flashToggle = () => {
-            const current = StorageManager.load().profile.settings;
-            StorageManager.save({ settings: { reducedFlashing: !current.reducedFlashing } });
-            panel.setText(this.settingsSummary(StorageManager.load().profile.settings));
-        };
-        const shakeToggle = () => {
-            const current = StorageManager.load().profile.settings;
-            StorageManager.save({ settings: { screenShake: current.screenShake === false } });
-            panel.setText(this.settingsSummary(StorageManager.load().profile.settings));
-        };
-        const touchCycle = () => {
-            const current = Number(StorageManager.load().profile.settings.touchOpacity) || 0.55;
-            const next = current >= 0.95 ? 0.35 : current + 0.2;
-            StorageManager.save({ settings: { touchOpacity: Number(next.toFixed(2)) } });
-            panel.setText(this.settingsSummary(StorageManager.load().profile.settings));
-        };
-        const close = () => {
-            panel.destroy();
-            this.input.keyboard.off('keydown-R', toggle);
-            this.input.keyboard.off('keydown-M', soundToggle);
-            this.input.keyboard.off('keydown-F', flashToggle);
-            this.input.keyboard.off('keydown-S', shakeToggle);
-            this.input.keyboard.off('keydown-T', touchCycle);
-        };
-        this.input.keyboard.on('keydown-R', toggle);
-        this.input.keyboard.on('keydown-M', soundToggle);
-        this.input.keyboard.on('keydown-F', flashToggle);
-        this.input.keyboard.on('keydown-S', shakeToggle);
-        this.input.keyboard.on('keydown-T', touchCycle);
-        this.input.keyboard.once('keydown-ESC', close);
-    }
-
-    settingsSummary(settings) {
-        const touchOpacity = Number(settings.touchOpacity) || 0.55;
-        return `SETTINGS\n\nREDUCED MOTION: ${settings.reducedMotion ? 'ON' : 'OFF'}\nREDUCED FLASHING: ${settings.reducedFlashing ? 'ON' : 'OFF'}\nSCREEN SHAKE: ${settings.screenShake === false ? 'OFF' : 'ON'}\nSOUND: ${window.soundEngine.isMuted ? 'OFF' : 'ON'}\nTOUCH OPACITY: ${Math.round(touchOpacity * 100)}%\n\nR MOTION  F FLASH  S SHAKE\nM SOUND  T TOUCH  ESC CLOSE`;
+        const panel = this.openDialog('Settings');
+        if (!panel) return;
+        const settings = StorageManager.load().profile.settings;
+        for (const [key, label, initial] of [
+            ['reducedMotion', 'Reduced motion', settings.reducedMotion],
+            ['reducedFlashing', 'Reduced flashing', settings.reducedFlashing],
+            ['screenShake', 'Screen shake', settings.screenShake !== false],
+            ['muted', 'Mute audio', window.soundEngine.isMuted]
+        ]) {
+            const row = document.createElement('label');
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.checked = Boolean(initial);
+            checkbox.addEventListener('change', () => {
+                StorageManager.save({ settings: { [key]: checkbox.checked } });
+                if (key === 'muted') window.soundEngine.setMuted(checkbox.checked);
+                if (key === 'reducedMotion') {
+                    this.reducedMotion = checkbox.checked;
+                    if (this.reducedMotion) this.tweens.pauseAll();
+                    else this.tweens.resumeAll();
+                }
+            });
+            row.append(checkbox, document.createTextNode(label));
+            panel.dialog.insertBefore(row, panel.close);
+        }
+        const row = document.createElement('label');
+        row.textContent = 'Touch control opacity ';
+        const opacity = document.createElement('input');
+        opacity.type = 'range';
+        opacity.min = '0.35';
+        opacity.max = '0.95';
+        opacity.step = '0.1';
+        opacity.value = String(settings.touchOpacity || 0.55);
+        opacity.setAttribute('aria-label', 'Touch control opacity');
+        opacity.addEventListener('input', () => StorageManager.save({ settings: { touchOpacity: Number(opacity.value) } }));
+        row.append(opacity);
+        panel.dialog.insertBefore(row, panel.close);
     }
 
     update() {
-        if (this.mist) {
+        if (this.mist && !this.reducedMotion) {
             this.mist.tilePositionX += 0.3;
         }
     }
@@ -300,6 +303,13 @@ class GameScene extends Phaser.Scene {
         this.levelIndex = Phaser.Math.Clamp(this.levelIndex, 0, levels.length - 1);
         this.currentLevel = levels[this.levelIndex];
         this.isPaused = false;
+        this.time.paused = false;
+        this.physics.world.resume();
+        window.soundEngine.setPaused(false);
+        this.victoryLotus = null;
+        StorageManager.save({ completed: false, currentStage: this.levelIndex, score: this.stageStartScore,
+            fireflies: this.stageStartFireflies, startOfStageScore: this.stageStartScore,
+            startOfStageFireflies: this.stageStartFireflies });
 
         // 1. Build level geometry, hazards, collectibles, enemies
         this.levelElements = window.LevelBuilder.build(this, this.currentLevel);
@@ -359,12 +369,15 @@ class GameScene extends Phaser.Scene {
         document.addEventListener('visibilitychange', this.handleVisibilityChange);
         this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
             document.removeEventListener('visibilitychange', this.handleVisibilityChange);
+            for (const event of ['add_score', 'add_firefly', 'player_died']) this.events.removeAllListeners(event);
+            window.soundEngine.setTrack(null);
+            window.soundEngine.setPaused(false);
         });
 
         // 9. Event listeners
-        this.events.on('add_score', (pts, x, y) => {
+        this.events.on('add_score', (pts, x, y, showPopup = true) => {
             this.ui.addScore(pts);
-            this.ui.showScorePopup(x, y, `+${pts}`);
+            if (showPopup) this.ui.showScorePopup(x, y, `+${pts}`);
         });
 
         this.events.on('add_firefly', (x, y) => {
@@ -379,7 +392,8 @@ class GameScene extends Phaser.Scene {
             this.scene.start('GameOverScene', {
                 levelIndex: this.levelIndex,
                 score: this.ui.score,
-                fireflies: this.carriedFireflies
+                fireflies: this.stageStartFireflies,
+                stageStartScore: this.stageStartScore
             });
         });
 
@@ -407,7 +421,8 @@ class GameScene extends Phaser.Scene {
     }
 
     restartStage() {
-        if (this.isPaused || this.isLevelCompleted || this.arenaTransitioning) return;
+        if (this.isLevelCompleted || this.arenaTransitioning || this.player.isDead) return;
+        if (this.isPaused) this.togglePause(false);
         this.ui.announce('Restarting stage');
         window.soundEngine.stopBossMusic();
         window.soundEngine.stopMusic();
@@ -444,10 +459,10 @@ class GameScene extends Phaser.Scene {
             [1450, 'OPTIONAL HIGH ROUTE: USE THE SPRING MUSHROOM']
         ];
         while (this.tutorial.step < prompts.length && x >= prompts[this.tutorial.step][0]) {
+            this.ui.showTutorialPrompt(prompts[this.tutorial.step][1]);
             this.tutorial.step += 1;
-            if (this.tutorial.step < prompts.length) this.ui.showTutorialPrompt(prompts[this.tutorial.step][1]);
         }
-        if (this.tutorial.step >= prompts.length) {
+        if (this.tutorial.step >= prompts.length && x >= 1800) {
             StorageManager.save({ tutorialFlags: { level1Complete: true } });
             this.ui.showTutorialPrompt('TUTORIAL COMPLETE — EXPLORE THE SWAMP!');
             this.tutorial = null;
@@ -456,6 +471,7 @@ class GameScene extends Phaser.Scene {
     }
 
     togglePause(forcePaused) {
+        if (this.isLevelCompleted || this.player.isDead) return;
         const shouldPause = typeof forcePaused === 'boolean' ? forcePaused : !this.isPaused;
         if (shouldPause === this.isPaused) return;
 
@@ -470,6 +486,7 @@ class GameScene extends Phaser.Scene {
             this.time.paused = false;
         }
         this.ui.setPaused(shouldPause);
+        window.soundEngine.setPaused(shouldPause);
     }
 
     setupCollisions() {
@@ -620,11 +637,8 @@ class GameScene extends Phaser.Scene {
             });
 
             // Player Spat Projectiles vs Boss
-            this.events.on('player_shot_spitball', (spitball) => {
-                this.physics.add.overlap(spitball, boss, (sb, b) => {
-                    b.takeSpitballDamage(sb);
-                });
-            });
+            this.spitballs = this.physics.add.group({ allowGravity: false });
+            this.physics.add.overlap(this.spitballs, boss, (sb, b) => b.takeSpitballDamage(sb));
 
             // Player vs Shockwaves
             this.physics.add.overlap(this.player, boss.shockwaves, (player, sw) => {
@@ -655,6 +669,7 @@ class GameScene extends Phaser.Scene {
         if (this.hasTriggeredArena) return;
         this.hasTriggeredArena = true;
         this.arenaTransitioning = true;
+        this.ui.clearTutorialPrompt();
         this.player.body.setVelocity(0, 0);
 
         // Restore player health to 3 hearts for the showdown
@@ -679,7 +694,6 @@ class GameScene extends Phaser.Scene {
                     this.arenaTransitioning = false;
                     window.soundEngine.playGateSlam();
                     window.rbaCameraShake(this.cameras.main, 260, 0.02);
-                    this.ui.showLevelBanner('KING CROAKER APPROACHES!');
                 }
             });
         } else {
@@ -690,8 +704,11 @@ class GameScene extends Phaser.Scene {
         // snap the player into the boss room before the barrier is visible.
         const bounds = this.currentLevel.arenaBounds;
         if (bounds) {
+            this.cameras.main.stopFollow();
+            if (!this.ui.reducedMotion) this.cameras.main.pan(bounds.x + this.scale.width / 2, bounds.y + bounds.height / 2, 650, 'Sine.easeInOut');
             this.time.delayedCall(650, () => {
                 this.cameras.main.setBounds(bounds.x, bounds.y, bounds.width, bounds.height);
+                this.cameras.main.startFollow(this.player, true, 0.04, 0.04);
             });
         }
 
@@ -706,11 +723,14 @@ class GameScene extends Phaser.Scene {
     }
 
     spawnVictoryLotus(x, y) {
+        if (this.victoryLotus || this.isLevelCompleted) return;
         const lotus = this.physics.add.sprite(x, y, 'golden_lotus').setDepth(15).setScale(1.6);
+        this.victoryLotus = lotus;
         lotus.body.setAllowGravity(false);
+        this.ui.updateObjective('CLAIM THE GOLDEN LOTUS');
 
         // Halo sparkles
-        this.tweens.add({
+        if (!this.ui.reducedMotion) this.tweens.add({
             targets: lotus,
             y: y - 16,
             duration: 850,
@@ -727,7 +747,7 @@ class GameScene extends Phaser.Scene {
             strokeThickness: 3
         }).setOrigin(0.5).setDepth(16);
 
-        this.tweens.add({
+        if (!this.ui.reducedMotion) this.tweens.add({
             targets: prompt,
             alpha: 0.3,
             duration: 500,
@@ -735,25 +755,26 @@ class GameScene extends Phaser.Scene {
             repeat: -1
         });
 
-        this.physics.add.overlap(this.player, lotus, () => {
+        const claim = () => {
+            if (!lotus.active || this.player.isDead || this.isLevelCompleted) return;
+            this.tweens.killTweensOf([lotus, prompt]);
             lotus.destroy();
             prompt.destroy();
             this.completeLevel();
-        });
-
-        this.physics.add.overlap(this.player.tongueTip, lotus, () => {
-            lotus.destroy();
-            prompt.destroy();
-            this.completeLevel();
-        });
+        };
+        this.physics.add.overlap(this.player, lotus, claim);
+        this.physics.add.overlap(this.player.tongueTip, lotus, claim,
+            () => this.player.tongueActive && !this.player.isDead);
     }
 
     completeLevel() {
-        if (this.isLevelCompleted) return;
+        if (this.isLevelCompleted || this.player.isDead) return;
         this.isLevelCompleted = true;
 
         this.player.body.setVelocity(0, 0);
         this.player.body.enable = false;
+        this.player.tongueTip.body.enable = false;
+        this.ui.clearTutorialPrompt();
         window.soundEngine.stopBossMusic();
         window.soundEngine.stopMusic();
         window.soundEngine.playWin();
@@ -762,18 +783,20 @@ class GameScene extends Phaser.Scene {
 
         // Sparkle fireworks celebration
         const winParticles = this.add.particles(this.player.x, this.player.y - 20, 'sparkle', {
+            emitting: false,
             speed: { min: 80, max: 240 },
             angle: { min: 0, max: 360 },
             scale: { start: 1.6, end: 0 },
             lifespan: 650,
             quantity: 40
         });
+        winParticles.explode(this.ui.reducedMotion ? 8 : 40);
 
         this.time.delayedCall(2200, () => {
             const nextLevel = this.levelIndex + 1;
             StorageManager.save({
-                currentStage: nextLevel,
-                unlockedStage: nextLevel,
+                currentStage: Math.min(nextLevel, window.LevelBuilder.getLevels().length - 1),
+                unlockedStage: Math.min(nextLevel, window.LevelBuilder.getLevels().length - 1),
                 score: this.ui.score + 1000,
                 fireflies: this.ui.fireflies,
                 startOfStageScore: this.ui.score + 1000,
@@ -812,7 +835,7 @@ class GameScene extends Phaser.Scene {
             return;
         }
 
-        if (this.isPaused) return;
+        if (this.isPaused || this.isLevelCompleted || this.player.isDead) return;
 
         // Collect keyboard + touch inputs
         const touch = this.ui.touchInputs;
@@ -822,13 +845,15 @@ class GameScene extends Phaser.Scene {
         const up = this.cursors.up.isDown || this.wasd.up.isDown;
 
         const jumpDown = this.cursors.space.isDown || this.wasd.space.isDown || this.cursors.up.isDown || this.wasd.up.isDown || touch.jump;
-        const jumpJustPressed = jumpDown && !this.prevJumpDown;
-        const jumpReleased = !jumpDown && this.prevJumpDown;
+        const jumpJustPressed = (jumpDown && !this.prevJumpDown) || touch.jumpQueued;
+        const jumpReleased = !jumpDown && (this.prevJumpDown || touch.jumpQueued);
         this.prevJumpDown = jumpDown;
 
         const tongueDown = this.wasd.x.isDown || this.wasd.shift.isDown || touch.tongue;
-        const tongueJustPressed = tongueDown && !this.prevTongueDown;
+        const tongueJustPressed = (tongueDown && !this.prevTongueDown) || touch.tongueQueued;
         this.prevTongueDown = tongueDown;
+        touch.jumpQueued = false;
+        touch.tongueQueued = false;
 
         const inputs = {
             left,
@@ -884,6 +909,8 @@ class VictoryScene extends Phaser.Scene {
     }
 
     create() {
+        window.soundEngine.setTrack('victory');
+        window.announceGame?.('Adventure complete! You found the Golden Lotus.');
         const w = this.scale.width;
         const h = this.scale.height;
 
@@ -907,17 +934,19 @@ class VictoryScene extends Phaser.Scene {
         this.add.image(w / 2, 175, 'golden_lotus').setScale(2);
         this.add.sprite(w / 2, 200, 'frog', 0).setScale(2);
 
-        this.time.addEvent({
+        if (!StorageManager.load().profile.settings.reducedMotion) this.time.addEvent({
             delay: 350,
             repeat: -1,
             callback: () => {
                 const rx = Phaser.Math.Between(100, w - 100);
                 const ry = Phaser.Math.Between(50, 250);
                 const p = this.add.particles(rx, ry, 'sparkle', {
+                    emitting: false,
                     speed: { min: 50, max: 140 },
                     lifespan: 500,
                     quantity: 14
                 });
+                p.explode(14);
                 this.time.delayedCall(600, () => p.destroy());
             }
         });
@@ -928,7 +957,7 @@ class VictoryScene extends Phaser.Scene {
 
         const prev = StorageManager.load();
         const isNewHigh = this.finalScore > prev.highScore;
-        const updated = StorageManager.save({ score: this.finalScore, unlockedStage: 4, fireflies: this.finalFlies });
+        StorageManager.save({ completed: true, score: this.finalScore, unlockedStage: 4, fireflies: this.finalFlies });
 
         this.add.text(w / 2, 280, `FINAL SCORE: ${String(this.finalScore).padStart(5, '0')}`, {
             fontFamily: '"Press Start 2P", monospace, sans-serif',
@@ -956,7 +985,7 @@ class VictoryScene extends Phaser.Scene {
             color: '#6ee7b7'
         }).setOrigin(0.5);
 
-        this.tweens.add({
+        if (!StorageManager.load().profile.settings.reducedMotion) this.tweens.add({
             targets: restartBtn,
             alpha: 0.3,
             duration: 600,
@@ -965,6 +994,7 @@ class VictoryScene extends Phaser.Scene {
         });
 
         const replay = () => {
+            StorageManager.newRun();
             this.scene.start('GameScene', { levelIndex: 0, score: 0, fireflies: 0 });
         };
         this.input.keyboard.once('keydown-SPACE', replay);
@@ -982,6 +1012,7 @@ class GameOverScene extends Phaser.Scene {
         this.levelIndex = data.levelIndex || 0;
         this.score = data.score || 0;
         this.fireflies = data.fireflies || 0;
+        this.stageStartScore = data.stageStartScore || 0;
     }
 
     create() {
@@ -989,6 +1020,8 @@ class GameOverScene extends Phaser.Scene {
         const h = this.scale.height;
 
         this.cameras.main.setBackgroundColor('#09090b');
+        window.soundEngine.setTrack('gameover');
+        window.announceGame?.('Game over. Press Space or tap to retry the stage.');
 
         this.add.text(w / 2, 125, 'GAME OVER', {
             fontFamily: '"Press Start 2P", monospace, sans-serif',
@@ -1002,7 +1035,8 @@ class GameOverScene extends Phaser.Scene {
 
         const prev = StorageManager.load();
         const isNewHigh = this.score > prev.highScore;
-        const updated = StorageManager.updateHighScore(this.score);
+        const updated = StorageManager.save({ bestScore: this.score, score: this.stageStartScore,
+            fireflies: this.fireflies, startOfStageScore: this.stageStartScore });
 
         this.add.text(w / 2, 275, `SCORE: ${String(this.score).padStart(5, '0')}`, {
             fontFamily: '"Press Start 2P", monospace, sans-serif',
@@ -1022,7 +1056,7 @@ class GameOverScene extends Phaser.Scene {
             color: '#fef08a'
         }).setOrigin(0.5);
 
-        this.tweens.add({
+        if (!StorageManager.load().profile.settings.reducedMotion) this.tweens.add({
             targets: prompt,
             alpha: 0.3,
             duration: 600,
@@ -1033,7 +1067,7 @@ class GameOverScene extends Phaser.Scene {
         const retry = () => {
             this.scene.start('GameScene', {
                 levelIndex: this.levelIndex,
-                score: 0,
+                score: this.stageStartScore,
                 fireflies: this.fireflies
             });
         };

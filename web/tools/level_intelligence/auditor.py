@@ -1,4 +1,5 @@
 import json
+import math
 from typing import Dict, Any, List, Optional
 from .physics_model import RibbitPhysics
 from .jev_client import JevEngine
@@ -42,17 +43,17 @@ class LevelAuditor:
                 "type": "platform",
                 "x": p["x"],
                 "y": p["y"],
-                "w": p.get("w", 100),
-                "h": p.get("h", 40),
+                "w": math.ceil(p.get("w", 100) / 32) * 32,
+                "h": math.ceil(p.get("h", 40) / 32) * 32,
                 "desc": f"Platform '{p.get('type', 'ground')}' ({p.get('w', 100)}px wide)"
             })
         for lp in lilypads:
             traversal_nodes.append({
                 "type": "lilypad",
-                "x": lp["x"],
-                "y": lp["y"],
-                "w": 56, # standard lilypad width
-                "h": 12,
+                "x": lp["x"] - 32,
+                "y": lp["y"] - 10,
+                "w": 64, # Runtime refreshBody currently uses the full texture bounds.
+                "h": 20,
                 "desc": "Floating Lilypad"
             })
 
@@ -147,6 +148,14 @@ class LevelAuditor:
 
             jev_result = self.jev.decide(state=state_summary, questions=questions)
             answers = jev_result.get("answers", {})
+            if self.jev.offline:
+                # A deterministic physics failure must never inherit the generic
+                # fallback's first choice (COMFORTABLE).
+                reachable = kinematics["is_reachable"]
+                tight = reachable and kinematics["req_speed"] > RibbitPhysics.BASE_SPEED
+                fairness = "UNFAIR" if not reachable else "TIGHT_EXECUTION" if tight else "FAIR_CHALLENGE"
+                answers["fairness"] = {"choice": fairness}
+                answers["difficulty_score"] = {"score": 3 if not reachable else 2 if tight else 1}
 
             jump_evaluations.append({
                 "jump_index": i + 1,

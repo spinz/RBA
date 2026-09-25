@@ -84,6 +84,12 @@ class GameUI {
         this.renderObjective();
     }
 
+    updateObjective(message) {
+        this.objective = message;
+        this.renderObjective();
+        this.announce(message);
+    }
+
     renderObjective() {
         if (!this.objectiveText) return;
         const progress = this.stageFireflyTotal > 0
@@ -158,18 +164,23 @@ class GameUI {
 
     showLevelBanner(title) {
         this.announce(title);
-        const banner = this.scene.add.container(this.scene.scale.width / 2, 180).setScrollFactor(0).setDepth(100);
+        if (this.levelBanner?.active) {
+            this.scene.tweens.killTweensOf(this.levelBanner);
+            this.levelBanner.destroy();
+        }
+        const banner = this.scene.add.container(this.scene.scale.width / 2, 175).setScrollFactor(0).setDepth(100);
+        this.levelBanner = banner;
 
         const bg = this.scene.add.graphics();
         bg.fillStyle(0x022c22, 0.85);
         bg.lineStyle(3, 0x22c55e, 1);
-        bg.fillRoundedRect(-200, -35, 400, 70, 12);
-        bg.strokeRoundedRect(-200, -35, 400, 70, 12);
+        bg.fillRoundedRect(-290, -30, 580, 60, 12);
+        bg.strokeRoundedRect(-290, -30, 580, 60, 12);
 
         const text = this.scene.add.text(0, 0, title, {
             fontFamily: '"Press Start 2P", monospace, sans-serif',
-            fontSize: '18px',
-            color: '#86efac'
+            fontSize: '14px',
+            color: '#86efac', align: 'center', wordWrap: { width: 540 }
         }).setOrigin(0.5);
 
         banner.add([bg, text]);
@@ -188,6 +199,7 @@ class GameUI {
             ease: 'Back.easeOut',
             onComplete: () => {
                 this.scene.time.delayedCall(1600, () => {
+                    if (!banner.active) return;
                     this.scene.tweens.add({
                         targets: banner,
                         alpha: 0,
@@ -230,7 +242,7 @@ class GameUI {
 
         const w = this.scene.scale.width;
         this.bossHearts = [];
-        this.bossContainer = this.scene.add.container(w / 2, 68).setScrollFactor(0).setDepth(100);
+        this.bossContainer = this.scene.add.container(w / 2, 108).setScrollFactor(0).setDepth(100);
 
         // Ornate dark stone banner
         const bg = this.scene.add.graphics();
@@ -261,10 +273,11 @@ class GameUI {
         }
 
         // Entrance slide-down tween
+        if (this.reducedMotion) return;
         this.bossContainer.setY(-30);
         this.scene.tweens.add({
             targets: this.bossContainer,
-            y: 68,
+            y: 108,
             duration: 450,
             ease: 'Back.easeOut'
         });
@@ -283,7 +296,7 @@ class GameUI {
         }
 
         // Shake HUD container on damage
-        if (this.bossContainer) {
+        if (this.bossContainer && !this.reducedMotion) {
             this.scene.tweens.add({
                 targets: this.bossContainer,
                 x: this.scene.scale.width / 2 + 5,
@@ -296,6 +309,12 @@ class GameUI {
 
     removeBossHealthBar() {
         if (this.bossContainer) {
+            this.scene.tweens.killTweensOf(this.bossContainer);
+            if (this.reducedMotion) {
+                this.bossContainer.destroy();
+                this.bossContainer = null;
+                return;
+            }
             this.scene.tweens.add({
                 targets: this.bossContainer,
                 y: -60,
@@ -328,10 +347,10 @@ class GameUI {
             fontSize: '28px',
             color: '#f0fdf4'
         }).setOrigin(0.5);
-        const hint = this.scene.add.text(0, 30, 'P / ESC OR TAP TO RESUME', {
+        const hint = this.scene.add.text(0, 30, 'P / ESC OR TAP TO RESUME\nR TO RESTART STAGE', {
             fontFamily: '"Press Start 2P", monospace, sans-serif',
             fontSize: '10px',
-            color: '#86efac'
+            color: '#86efac', align: 'center', lineSpacing: 12
         }).setOrigin(0.5);
 
         backdrop.on('pointerdown', () => this.scene.togglePause(false));
@@ -339,6 +358,8 @@ class GameUI {
     }
 
     setPaused(isPaused) {
+        this.resetTouch?.();
+        if (this.touchControls) this.touchControls.hidden = isPaused;
         if (this.pauseContainer) this.pauseContainer.setVisible(isPaused);
         this.announce(isPaused ? 'Game paused' : 'Game resumed');
     }
@@ -353,7 +374,9 @@ class GameUI {
             left: false,
             right: false,
             jump: false,
-            tongue: false
+            tongue: false,
+            jumpQueued: false,
+            tongueQueued: false
         };
 
         const hasCoarsePointer = window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches;
@@ -361,61 +384,36 @@ class GameUI {
         const isTouchDevice = hasCoarsePointer || isNarrowTouchScreen;
         if (!isTouchDevice) return;
 
-        const touchContainer = this.scene.add.container(0, 0).setScrollFactor(0).setDepth(100);
-
-        // Helper to draw virtual circular button
-        const makeBtn = (x, y, radius, label, color, onDown, onUp) => {
-            const circle = this.scene.add.circle(x, y, radius, color, this.touchOpacity)
-                .setInteractive({ useHandCursor: true });
-            circle.setStrokeStyle(2, 0xffffff, 0.6);
-
-            const txt = this.scene.add.text(x, y, label, {
-                fontFamily: 'sans-serif',
-                fontSize: `${radius * 0.62}px`,
-                fontStyle: 'bold',
-                color: '#ffffff'
-            }).setOrigin(0.5);
-
-            circle.on('pointerdown', () => {
-                circle.setFillStyle(color, 0.8);
-                onDown();
+        const controls = document.createElement('div');
+        controls.className = 'touch-controls';
+        controls.style.setProperty('--touch-opacity', String(this.touchOpacity));
+        const buttons = [];
+        for (const [action, label] of [['left', 'Left'], ['right', 'Right'], ['tongue', 'Lash'], ['jump', 'Jump']]) {
+            const button = document.createElement('button');
+            button.textContent = label;
+            button.setAttribute('aria-label', action === 'tongue' ? 'Tongue attack' : label);
+            const release = () => { this.touchInputs[action] = false; };
+            button.addEventListener('pointerdown', event => {
+                event.preventDefault();
+                button.setPointerCapture(event.pointerId);
+                this.touchInputs[action] = true;
+                if (action === 'jump' || action === 'tongue') this.touchInputs[`${action}Queued`] = true;
             });
-            circle.on('pointerup', () => {
-                circle.setFillStyle(color, this.touchOpacity);
-                onUp();
-            });
-            circle.on('pointerout', () => {
-                circle.setFillStyle(color, this.touchOpacity);
-                onUp();
-            });
-
-            touchContainer.add([circle, txt]);
-        };
-
-        const screenH = this.scene.scale.height;
-        const screenW = this.scene.scale.width;
-
-        // D-Pad Left / Right
-        makeBtn(70, screenH - 66, 46, '<', 0x334155,
-            () => this.touchInputs.left = true,
-            () => this.touchInputs.left = false
-        );
-        makeBtn(170, screenH - 66, 46, '>', 0x334155,
-            () => this.touchInputs.right = true,
-            () => this.touchInputs.right = false
-        );
-
-        // Action B (Tongue)
-        makeBtn(screenW - 170, screenH - 66, 46, 'LASH', 0xec4899,
-            () => this.touchInputs.tongue = true,
-            () => this.touchInputs.tongue = false
-        );
-
-        // Action A (Jump)
-        makeBtn(screenW - 65, screenH - 66, 50, '^', 0x22c55e,
-            () => this.touchInputs.jump = true,
-            () => this.touchInputs.jump = false
-        );
+            for (const event of ['pointerup', 'pointercancel', 'lostpointercapture', 'blur']) {
+                button.addEventListener(event, release);
+            }
+            controls.append(button);
+            buttons.push(button);
+        }
+        const reset = () => Object.keys(this.touchInputs).forEach(key => { this.touchInputs[key] = false; });
+        this.resetTouch = reset;
+        window.addEventListener('blur', reset);
+        document.getElementById('game-wrapper').append(controls);
+        this.touchControls = controls;
+        this.scene.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+            window.removeEventListener('blur', reset);
+            controls.remove();
+        });
     }
 }
 

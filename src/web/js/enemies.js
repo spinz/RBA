@@ -349,6 +349,7 @@ class BossKingCroaker extends Phaser.Physics.Arcade.Sprite {
         this.scene = scene;
         this.maxHp = 6;
         this.hp = 6;
+        this.reducedFlashing = Boolean(window.StorageManager.load().profile.settings.reducedFlashing);
         this.state = 'WAITING'; // WAITING, INTRO, IDLE, WINDUP, JUMP_UP, AIR_AIM, SLAM_DOWN, STUNNED, SPIT, TONGUE, HURT, DEFEATED
         this.isInvincible = false;
         this.invincibleUntil = 0;
@@ -366,8 +367,8 @@ class BossKingCroaker extends Phaser.Physics.Arcade.Sprite {
         this.shadow = scene.add.image(x, y + 36, 'shadow').setScale(2.4, 1.4).setAlpha(0.55).setDepth(6);
 
         // Shockwaves & Projectiles
-        this.shockwaves = [];
-        this.venomBalls = scene.physics.add.group();
+        this.shockwaves = scene.physics.add.group({ allowGravity: false });
+        this.venomBalls = scene.physics.add.group({ bounceX: 0.65, bounceY: 0.65 });
 
         // Stun stars container
         this.stunStars = scene.add.container(x, y - 32).setVisible(false).setDepth(15);
@@ -453,6 +454,7 @@ class BossKingCroaker extends Phaser.Physics.Arcade.Sprite {
         window.rbaCameraShake(this.scene.cameras.main, 500, 0.02);
 
         this.scene.time.delayedCall(900, () => {
+            if (!this.active || this.state !== 'INTRO') return;
             this.play('boss_idle');
             this.state = 'IDLE';
             this.nextAttackTime = this.scene.time.now + 1400;
@@ -471,16 +473,7 @@ class BossKingCroaker extends Phaser.Physics.Arcade.Sprite {
             this.shadow.setAlpha(Math.max(0.15, 0.6 - heightAboveGround * 0.0015));
         }
 
-        // Keep the original array reference so the physics overlap registered by
-        // GameScene continues to observe newly spawned shockwaves.
-        for (let i = this.shockwaves.length - 1; i >= 0; i--) {
-            const shockwave = this.shockwaves[i];
-            if (!shockwave.active) {
-                this.shockwaves.splice(i, 1);
-            } else {
-                shockwave.update(time);
-            }
-        }
+        this.shockwaves.getChildren().forEach(shockwave => shockwave.update(time));
 
         // Facing direction toward player
         if (['IDLE', 'WINDUP', 'STUNNED', 'SPIT'].includes(this.state)) {
@@ -493,7 +486,7 @@ class BossKingCroaker extends Phaser.Physics.Arcade.Sprite {
             this.stunStars.setPosition(this.x, this.y - 32);
             this.stompPrompt.setPosition(this.x, this.y - 52);
             this.stunStars.setVisible(true);
-            this.stompPrompt.setVisible(time % 400 > 150);
+            this.stompPrompt.setVisible(this.reducedFlashing || time % 400 > 150);
 
             this.stunStars.list.forEach((star, idx) => {
                 const angle = (time * 0.006) + (idx * (Math.PI / 2));
@@ -510,7 +503,7 @@ class BossKingCroaker extends Phaser.Physics.Arcade.Sprite {
                 this.isInvincible = false;
                 this.setAlpha(1);
             } else {
-                this.setAlpha(time % 120 > 60 ? 0.35 : 1);
+                this.setAlpha(this.reducedFlashing ? 0.65 : (time % 120 > 60 ? 0.35 : 1));
             }
         }
 
@@ -552,6 +545,7 @@ class BossKingCroaker extends Phaser.Physics.Arcade.Sprite {
                     const targetX = Phaser.Math.Clamp(this.scene.player.x, this.arenaXMin + 60, this.arenaXMax - 60);
 
                     this.scene.time.delayedCall(this.hp <= 2 ? 350 : 650, () => {
+                        if (!this.active || this.state !== 'AIR_AIM') return;
                         this.x = targetX;
                         this.state = 'SLAM_DOWN';
                         this.play('boss_slam');
@@ -591,6 +585,7 @@ class BossKingCroaker extends Phaser.Physics.Arcade.Sprite {
         this.emitDust(6);
 
         this.scene.time.delayedCall(this.hp <= 2 ? 350 : 550, () => {
+            if (!this.active || this.state !== 'WINDUP') return;
             this.state = 'JUMP_UP';
             this.play('boss_slam');
             this.body.setVelocityY(-720);
@@ -611,7 +606,9 @@ class BossKingCroaker extends Phaser.Physics.Arcade.Sprite {
         const speed = this.hp <= 2 ? 280 : 220;
         const swLeft = new BossShockwave(this.scene, this.x - 30, this.arenaFloorY + 12, -1, speed);
         const swRight = new BossShockwave(this.scene, this.x + 30, this.arenaFloorY + 12, 1, speed);
-        this.shockwaves.push(swLeft, swRight);
+        this.shockwaves.addMultiple([swLeft, swRight]);
+        swLeft.body.setVelocityX(-speed);
+        swRight.body.setVelocityX(speed);
 
         const stunDuration = this.hp <= 2 ? 1900 : (this.hp <= 4 ? 2400 : 2900);
 
@@ -647,6 +644,7 @@ class BossKingCroaker extends Phaser.Physics.Arcade.Sprite {
 
                 const venom = new BossVenomBall(this.scene, mouthX, mouthY, vx, vy);
                 this.venomBalls.add(venom);
+                venom.body.setVelocity(vx, vy);
                 window.soundEngine.playTongue();
 
                 spawned++;
@@ -678,7 +676,7 @@ class BossKingCroaker extends Phaser.Physics.Arcade.Sprite {
 
         this.scene.tweens.add({
             targets: warning,
-            alpha: 0.2,
+            alpha: this.reducedFlashing ? 1 : 0.2,
             yoyo: true,
             repeat: 3,
             duration: 150,
@@ -700,6 +698,11 @@ class BossKingCroaker extends Phaser.Physics.Arcade.Sprite {
                 delay: 20,
                 repeat: 25,
                 callback: () => {
+                    if (!this.active || this.state !== 'TONGUE') {
+                        if (this.bossTongueGfx?.active) this.bossTongueGfx.clear();
+                        this.tongueSweepActive = false;
+                        return;
+                    }
                     progress += 0.04;
                     const currentX = startX + (sweepDir * sweepDistance * Math.sin(progress * Math.PI));
                     const currentY = this.arenaFloorY - 4;
@@ -740,7 +743,7 @@ class BossKingCroaker extends Phaser.Physics.Arcade.Sprite {
     }
 
     takeTongueDamage(player) {
-        if (this.state === 'DEFEATED' || this.state === 'AIR_AIM') return;
+        if (!this.active || ['WAITING', 'INTRO', 'DEFEATED', 'AIR_AIM'].includes(this.state)) return;
 
         // Force player tongue to retract with snap impact
         if (player) {
@@ -749,7 +752,7 @@ class BossKingCroaker extends Phaser.Physics.Arcade.Sprite {
 
         // If boss is in i-frame recovery, give deflect audio/visual feedback
         if (this.isInvincible) {
-            window.soundEngine.playFilteredNoise(this.scene.time.now, 0.03, 'highpass', 4200, 0.04);
+            window.soundEngine.playFilteredNoise(window.soundEngine.ctx?.currentTime || 0, 0.03, 'highpass', 4200, 0.04);
             const spark = this.scene.add.image(this.x, this.y - 10, 'sparkle').setScale(0.8).setTint(0x94a3b8);
             this.scene.tweens.add({
                 targets: spark,
@@ -773,7 +776,7 @@ class BossKingCroaker extends Phaser.Physics.Arcade.Sprite {
         window.soundEngine.playStomp();
 
         window.rbaCameraShake(this.scene.cameras.main, isCritical ? 320 : 240, isCritical ? 0.024 : 0.018);
-        this.scene.events.emit('add_score', isCritical ? 2000 : 1000, this.x, this.y - 20);
+        this.scene.events.emit('add_score', isCritical ? 2000 : 1000, this.x, this.y - 20, false);
         this.scene.ui.showScorePopup(
             this.x, 
             this.y - 35, 
@@ -804,7 +807,7 @@ class BossKingCroaker extends Phaser.Physics.Arcade.Sprite {
     }
 
     takeSpitballDamage(spitball) {
-        if (this.isInvincible || this.state === 'DEFEATED' || this.state === 'AIR_AIM') return;
+        if (!this.active || this.isInvincible || ['WAITING', 'INTRO', 'DEFEATED', 'AIR_AIM'].includes(this.state)) return;
         spitball.destroy();
 
         this.hp -= 1;
@@ -817,7 +820,7 @@ class BossKingCroaker extends Phaser.Physics.Arcade.Sprite {
         window.soundEngine.playBossSlam();
 
         window.rbaCameraShake(this.scene.cameras.main, 320, 0.025);
-        this.scene.events.emit('add_score', 1500, this.x, this.y - 20);
+        this.scene.events.emit('add_score', 1500, this.x, this.y - 20, false);
         this.scene.ui.showScorePopup(this.x, this.y - 45, 'SPITBALL BOOM! -1 HP', '#fde047');
         this.scene.ui.updateBossHealth(this.hp);
 
@@ -843,7 +846,7 @@ class BossKingCroaker extends Phaser.Physics.Arcade.Sprite {
     }
 
     takeStompDamage(player) {
-        if (this.isInvincible || this.state === 'DEFEATED' || this.state === 'AIR_AIM') return;
+        if (!this.active || this.isInvincible || ['WAITING', 'INTRO', 'DEFEATED', 'AIR_AIM'].includes(this.state)) return;
 
         const isCritical = this.state === 'STUNNED';
         const damage = isCritical ? 2 : 1;
@@ -859,7 +862,7 @@ class BossKingCroaker extends Phaser.Physics.Arcade.Sprite {
         player.body.setVelocityY(-560);
 
         window.rbaCameraShake(this.scene.cameras.main, isCritical ? 320 : 260, 0.025);
-        this.scene.events.emit('add_score', isCritical ? 2000 : 1000, this.x, this.y - 20);
+        this.scene.events.emit('add_score', isCritical ? 2000 : 1000, this.x, this.y - 20, false);
         this.scene.ui.showScorePopup(
             this.x, 
             this.y - 35, 
@@ -890,18 +893,25 @@ class BossKingCroaker extends Phaser.Physics.Arcade.Sprite {
     }
 
     defeat() {
+        if (!this.active || this.state === 'DEFEATED') return;
+        const scene = this.scene;
+        // Capture a reachable ground reward position before the death tween moves
+        // the sprite. Phaser clears this.scene when the sprite is destroyed.
+        const rewardX = Phaser.Math.Clamp(this.x, this.arenaXMin + 80, this.arenaXMax - 80);
+        const rewardY = this.arenaFloorY - 48;
         this.state = 'DEFEATED';
+        this.hp = 0;
+        this.tongueSweepActive = false;
         this.body.enable = false;
         if (this.shadow) this.shadow.destroy();
         this.stunStars.setVisible(false);
         this.stompPrompt.setVisible(false);
         this.bossTongueGfx.clear();
 
-        this.shockwaves.forEach(sw => sw.destroy());
-        this.shockwaves = [];
+        this.shockwaves.clear(true, true);
         this.venomBalls.clear(true, true);
 
-        window.soundEngine.stopBossMusic();
+        window.soundEngine.setTrack('reward');
         window.soundEngine.playWin();
 
         this.play('boss_hurt');
@@ -909,29 +919,31 @@ class BossKingCroaker extends Phaser.Physics.Arcade.Sprite {
         window.rbaCameraFlash(this.scene.cameras.main, 400, 255, 255, 255);
 
         const winParticles = this.scene.add.particles(this.x, this.y, 'sparkle', {
+            emitting: false,
             speed: { min: 80, max: 320 },
             angle: { min: 0, max: 360 },
             scale: { start: 2.2, end: 0 },
             lifespan: 1200,
             quantity: 60
         });
+        winParticles.explode(60);
+        scene.time.delayedCall(1300, () => winParticles.destroy());
 
         this.scene.events.emit('add_score', 5000, this.x, this.y - 40);
-        this.scene.ui.showScorePopup(this.x, this.y - 40, '+5000 BOSS SLAIN!', '#fde047');
         this.scene.ui.showLevelBanner('KING CROAKER DEFEATED!');
         this.scene.ui.removeBossHealthBar();
 
         this.scene.tweens.add({
             targets: this,
             y: this.y - 80,
-            angle: 720,
+            angle: scene.ui.reducedMotion ? 0 : 720,
             scaleX: 0,
             scaleY: 0,
-            duration: 1600,
+            duration: scene.ui.reducedMotion ? 300 : 1600,
             ease: 'Cubic.easeIn',
             onComplete: () => {
                 this.destroy();
-                this.scene.spawnVictoryLotus(this.x, this.y - 28);
+                if (scene.sys.isActive()) scene.spawnVictoryLotus(rewardX, rewardY);
             }
         });
     }

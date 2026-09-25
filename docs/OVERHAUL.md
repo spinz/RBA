@@ -6,7 +6,11 @@ The strongest direction for RBA is a **moonlit storybook arcade**: keep the expr
 
 The Godot project is currently a movement prototype and should remain labelled that way until it shares level data, mechanics, progression, and tests with the web game.
 
-## Phase 1 — completed
+This file records delivered slices. Phase numbers in `AGENT_EXECUTION_PLAN.md`
+remain authoritative; a slice is not proof that every acceptance gate is complete.
+See `PROJECT_REVIEW.md` for the current review and remaining work.
+
+## Phase 1 — delivered stability work
 
 - Fixed the boss meteor state-machine soft lock.
 - Restored collision tracking for dynamically spawned boss shockwaves.
@@ -55,13 +59,13 @@ The Godot project is currently a movement prototype and should remain labelled t
 ## Phase 5 — gameplay reliability and onboarding slice
 
 - Added a Level 1 teaching sequence for movement, jumping, tongue use, water crossings, enemy awareness, and the optional high route.
-- Persisted `level1Complete` so mastered prompts stay out of later runs until a New Adventure is chosen.
+- Persisted `level1Complete` so mastered prompts stay out of later runs.
 - Routed gameplay camera shake/flash behavior through the same accessibility gates used by the HUD.
 - Added static onboarding regression guards and verified clean browser startup after the tutorial integration.
-- Fixed King Croaker completion: the victory lotus now spawns at the defeated boss instead of a hard-coded arena coordinate, and the post-defeat reward path no longer stalls on the score popup.
+- Fixed the reduced-motion score popup. The first boss reward-position change was incomplete; the later lifecycle fix below resolves the reproduced crash.
 - Sequenced the level-4 gate, camera bounds, boss HUD, and boss activation so the arena transition reads as one intentional encounter intro.
 
-## Phase 2 — campaign and onboarding
+## Original campaign follow-ups (historical checklist)
 
 1. Replace the persistent stage toolbar with a title flow: **Continue**, **New Adventure**, **Stage Map**, and **Settings**. Keep direct stage jumps behind a development query flag.
 2. Make `unlockedStage` meaningful in the stage map and add an explicit reset/new-adventure confirmation.
@@ -69,7 +73,7 @@ The Godot project is currently a movement prototype and should remain labelled t
 4. Show per-stage collectible totals and a compact objective line in the HUD.
 5. Add restart-stage, reduced-motion/flash, audio persistence, and input-remapping settings.
 
-## Phase 3 — architecture and content pipeline
+## Original architecture follow-ups (historical checklist)
 
 1. Move authored level data from JavaScript object literals into canonical JSON validated by a schema.
 2. Share movement constants between runtime and offline level analysis.
@@ -85,14 +89,25 @@ The Godot project is currently a movement prototype and should remain labelled t
 - The next visual pass needs an art bible, asset-size conventions, animation lists, and an atlas-loading pipeline before replacing placeholders.
 - The Godot prototype uses different movement constants and has no campaign, combat, persistence, or level-loader parity yet.
 
-## Phase 6 — objective HUD slice
+## Additional objective HUD slice (part of planned Phase 7)
 
 - Added a compact fixed HUD objective for every stage, with local firefly progress shown separately from the carried campaign total.
 - Boss stages now identify the King Croaker objective before the encounter begins; shrine stages identify the goal shrine.
 - Added static regression guards for objective HUD wiring.
 
-## Phase 7 — restart reliability slice
+## Additional restart slice (part of planned Phases 3–5)
 
 - Added an in-level `R` restart that restores the score and fireflies captured at stage start.
 - Persisted the stage-start score alongside the existing stage-start firefly checkpoint for safe reloads.
-- Kept restart disabled during pause, boss-gate transitions, and stage completion to avoid duplicate scene transitions.
+- Restart is available while paused; it remains disabled during death, boss-gate transitions, and stage completion.
+
+## September 24 reliability, audio, and usability review
+
+- Reproduced the post-boss crash in a production browser: the defeat callback dereferenced `this.scene` after Phaser destroyed the sprite. Captured the scene and ground-level reward coordinates before destruction, guarded repeated rewards, and canceled invalid pending attacks.
+- Verified the reward through stage 5, final victory, and Continue after reload. Added a simulated ten-minute boss state/physics soak across all three health phases.
+- Replaced independent audio timers with one scene-aware soundtrack controller. Unified instruments and mix buses, softened effects with a master compressor, and added title/reward/game-over/ending motifs. Mute and pause retain the intended track, including during silent scene changes; voices are stopped and disconnected on mute, pause, and cleanup.
+- Removed accumulating gameplay listeners and per-spitball collision handlers. Shockwaves and spitballs now use physics groups.
+- Fixed death/retry checkpoint scores, save-return aliases, completed-run Continue, and New Adventure preserving records/settings/unlocks.
+- Fixed skipped tutorial prompts, duplicate boss-hit score labels, overlapping HUD banners, endless victory particles, duplicate bounce/eat cues, and reduced-flash invulnerability rendering.
+- Replaced keyboard-only settings and stage-map panels with native, focusable dialogs. Added CSS-sized multi-touch controls, pause/retry buttons, and desktop/landscape/portrait screenshot coverage.
+- Corrected offline audit geometry and stopped deterministic fallback from calling impossible jumps comfortable. API dependencies are now optional for offline checks.

@@ -33,8 +33,8 @@ class FrogPlayer extends Phaser.Physics.Arcade.Sprite {
         // Platforming feel timers
         this.coyoteTime = window.RbaPhysics.coyoteTimeMs;
         this.jumpBufferTime = window.RbaPhysics.jumpBufferMs;
-        this.lastGroundedTime = 0;
-        this.lastJumpPressedTime = 0;
+        this.lastGroundedTime = -Infinity;
+        this.lastJumpPressedTime = -Infinity;
         this.wasOnGround = true;
 
         // Tongue mechanic state
@@ -62,6 +62,7 @@ class FrogPlayer extends Phaser.Physics.Arcade.Sprite {
         this.starTimer = 0;
         this.facing = 'right';
         this.isDead = false;
+        this.reducedFlashing = Boolean(window.StorageManager.load().profile.settings.reducedFlashing);
 
         // Yoshi-style Spitback mechanic
         this.hasSpitProjectile = false;
@@ -167,8 +168,8 @@ class FrogPlayer extends Phaser.Physics.Arcade.Sprite {
 
         if (bufferedJump && canJump && this.body.velocity.y >= 0) {
             this.executeJump(this.JUMP_SPEED);
-            this.lastJumpPressedTime = 0; // Consume buffer
-            this.lastGroundedTime = 0;
+            this.lastJumpPressedTime = -Infinity; // Consume buffer
+            this.lastGroundedTime = -Infinity;
         }
 
         // Variable Jump Height (Mario-style cutoff on key release)
@@ -177,7 +178,9 @@ class FrogPlayer extends Phaser.Physics.Arcade.Sprite {
         }
 
         // Flashing hurt/invincibility
-        if (!this.isInvincible || time % 100 > 50) {
+        if (this.reducedFlashing) {
+            this.setAlpha(this.isInvincible ? 0.65 : 1);
+        } else if (!this.isInvincible || time % 100 > 50) {
             this.setAlpha(1);
         } else {
             this.setAlpha(0.3);
@@ -185,7 +188,7 @@ class FrogPlayer extends Phaser.Physics.Arcade.Sprite {
 
         // Star Power rainbow aura
         if (this.starPower) {
-            const hue = (time * 0.6) % 360;
+            const hue = this.reducedFlashing ? 50 : (time * 0.6) % 360;
             const color = Phaser.Display.Color.HSVToRGB(hue / 360, 0.85, 1).color;
             this.setTint(color);
 
@@ -255,7 +258,6 @@ class FrogPlayer extends Phaser.Physics.Arcade.Sprite {
 
     bounceOffMushroom() {
         this.executeJump(this.SUPER_JUMP_SPEED);
-        window.soundEngine.playBounce();
     }
 
     bounceOffEnemy() {
@@ -337,7 +339,7 @@ class FrogPlayer extends Phaser.Physics.Arcade.Sprite {
                     this.tongueTip.body.enable = false;
 
                     // Swallow caught target
-                    if (this.caughtTarget) {
+                    if (this.caughtTarget?.active) {
                         this.swallowTarget(this.caughtTarget);
                         this.caughtTarget = null;
                     }
@@ -349,7 +351,7 @@ class FrogPlayer extends Phaser.Physics.Arcade.Sprite {
             const tipY = mouthY + Math.sin(this.tongueAngle) * this.tongueLength;
             this.tongueTip.setPosition(tipX, tipY);
 
-            if (this.caughtTarget) {
+            if (this.caughtTarget?.active) {
                 this.caughtTarget.setPosition(tipX, tipY);
             }
 
@@ -391,7 +393,7 @@ class FrogPlayer extends Phaser.Physics.Arcade.Sprite {
     }
 
     swallowTarget(obj) {
-        window.soundEngine.playEat();
+        if (!obj?.active) return;
         const p = this.scene.add.particles(this.x, this.y, 'sparkle', {
             speed: { min: 50, max: 130 },
             lifespan: 380,
@@ -435,18 +437,19 @@ class FrogPlayer extends Phaser.Physics.Arcade.Sprite {
         window.soundEngine.playJump(true);
         if (window.PlayerSpitball) {
             const spitball = new window.PlayerSpitball(this.scene, mouthX, mouthY, dir);
-            this.scene.events.emit('player_shot_spitball', spitball);
+            this.scene.spitballs?.add(spitball);
+            spitball.body.setVelocityX(dir * 520);
         }
     }
 
     takeDamage(amount = 1) {
-        if (this.isInvincible || this.isDead) return;
+        if (this.isInvincible || this.isDead || this.scene.isLevelCompleted) return;
 
         this.hp -= amount;
         if (this.scene.ui) {
             this.scene.ui.updateHealth(this.hp);
         }
-        window.soundEngine.playHurt();
+        if (this.hp > 0) window.soundEngine.playHurt();
 
         // Screen shake
         window.rbaCameraShake(this.scene.cameras.main, 180, 0.015);
@@ -476,6 +479,10 @@ class FrogPlayer extends Phaser.Physics.Arcade.Sprite {
         if (this.isDead) return;
         this.isDead = true;
         this.body.enable = false;
+        this.tongueActive = false;
+        this.tongueTip.body.enable = false;
+        this.tongueTip.setVisible(false);
+        this.tongueGfx.clear();
         if (this.shadow) this.shadow.destroy();
         this.play('frog_hurt', true);
         window.soundEngine.playHurt();

@@ -2,10 +2,15 @@
 const RbaSaveDefaults = Object.freeze({
     version: 2,
     profile: { unlockedStage: 0, bestScore: 0, bestFireflyCount: 0, settings: {}, tutorialFlags: {} },
-    run: { currentStage: 0, score: 0, carriedFireflies: 0, startOfStageScore: 0, startOfStageFireflies: 0 }
+    run: { currentStage: 0, score: 0, carriedFireflies: 0, startOfStageScore: 0, startOfStageFireflies: 0, completed: false }
 });
 
-const cloneSaveDefaults = () => structuredClone(RbaSaveDefaults);
+const cloneSaveDefaults = () => {
+    const defaults = structuredClone(RbaSaveDefaults);
+    const reduced = Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
+    defaults.profile.settings = { reducedMotion: reduced, reducedFlashing: reduced };
+    return defaults;
+};
 
 const StorageManager = {
     KEY: 'rba_save_data_v1',
@@ -20,15 +25,17 @@ const StorageManager = {
                 unlockedStage: Math.max(0, Number(profile.unlockedStage) || 0),
                 bestScore: Math.max(0, Number(profile.bestScore ?? profile.highScore) || 0),
                 bestFireflyCount: Math.max(0, Number(profile.bestFireflyCount ?? profile.totalFireflies) || 0),
-                settings: profile.settings && typeof profile.settings === 'object' ? profile.settings : {},
+                settings: { ...cloneSaveDefaults().profile.settings,
+                    ...(profile.settings && typeof profile.settings === 'object' ? profile.settings : {}) },
                 tutorialFlags: profile.tutorialFlags && typeof profile.tutorialFlags === 'object' ? profile.tutorialFlags : {}
             },
             run: {
+                completed: run.completed === true,
                 currentStage: Math.max(0, Number(run.currentStage ?? raw.currentStage) || 0),
                 score: Math.max(0, Number(run.score ?? raw.score) || 0),
                 carriedFireflies: Math.max(0, Number(run.carriedFireflies ?? raw.fireflies) || 0),
-                startOfStageScore: Math.max(0, Number(run.startOfStageScore) || 0),
-                startOfStageFireflies: Math.max(0, Number(run.startOfStageFireflies) || 0)
+                startOfStageScore: Math.max(0, Number(run.startOfStageScore ?? run.score ?? raw.score) || 0),
+                startOfStageFireflies: Math.max(0, Number(run.startOfStageFireflies ?? run.carriedFireflies ?? raw.fireflies) || 0)
             }
         };
         // Legacy aliases keep existing scene code compatible during migration.
@@ -46,13 +53,14 @@ const StorageManager = {
     save(data = {}) {
         const current = this.load();
         const migrated = this.migrate(current);
-        migrated.profile.bestScore = Math.max(current.profile.bestScore, Number(data.score) || 0);
+        migrated.profile.bestScore = Math.max(current.profile.bestScore, Number(data.bestScore ?? data.score) || 0);
         migrated.profile.bestFireflyCount = Math.max(current.profile.bestFireflyCount, Number(data.fireflies) || 0);
         migrated.profile.unlockedStage = Math.max(current.profile.unlockedStage, Number(data.unlockedStage) || 0);
         migrated.profile.settings = { ...current.profile.settings, ...(data.settings || {}) };
         migrated.profile.tutorialFlags = { ...current.profile.tutorialFlags, ...(data.tutorialFlags || {}) };
         migrated.run = {
             ...current.run,
+            completed: data.completed ?? current.run.completed,
             currentStage: Math.max(0, Number(data.currentStage ?? current.run.currentStage) || 0),
             score: Math.max(0, Number(data.score ?? current.run.score) || 0),
             carriedFireflies: Math.max(0, Number(data.fireflies ?? current.run.carriedFireflies) || 0),
@@ -60,7 +68,13 @@ const StorageManager = {
             startOfStageFireflies: Math.max(0, Number(data.startOfStageFireflies ?? current.run.startOfStageFireflies) || 0)
         };
         try { localStorage.setItem(this.KEY, JSON.stringify(migrated)); } catch (error) {}
-        return migrated;
+        return this.migrate(migrated);
+    },
+    newRun() {
+        const current = this.load();
+        current.run = structuredClone(RbaSaveDefaults.run);
+        try { localStorage.setItem(this.KEY, JSON.stringify(current)); } catch (error) {}
+        return this.migrate(current);
     },
     reset() {
         const fresh = cloneSaveDefaults();
