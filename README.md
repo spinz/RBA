@@ -40,6 +40,8 @@ edit them. The Python level-intelligence tools under `web/tools/` remain active.
 - **Squash & Stretch**: Procedural sprite deformation responsive to velocity changes and impact landings.
 - **Momentum Bouncing**: Enhanced vertical launch velocity off fungal springs and bouncy lilypads.
 - **Tongue Attack**: Directional tongue strike to snare fireflies and neutralize swamp pests.
+- **Temporary Power-ups**: A bubble shield absorbs one hit, while long tongue grants 1.5× reach for 15 seconds of active play.
+- **Enemy Counterplay**: Charging beetles telegraph their rushes, and reed-spitter shots can be caught and fired back at ordinary enemies or Croaker.
 
 ### Controls
 - **Move Left / Right**: `A` / `D` or `Left` / `Right Arrow`
@@ -160,6 +162,9 @@ the current scope of JavaScript type checking.
 
 See [the project review](docs/PROJECT_REVIEW.md) for the reproduced boss-crash fix,
 campaign/audio regression coverage, screenshot checks, and honest roadmap status.
+See [the gameplay-depth plan](docs/GAMEPLAY_DEPTH_PLAN.md) and
+[level-design handoff](docs/LEVEL_DEPTH_DESIGN.md) for the first-five encounter
+pass and the deliberately queued second chapter.
 
 ### Running the Godot 4 Edition
 Requirements: Godot 4.x installed on your system.

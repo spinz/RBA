@@ -24,7 +24,7 @@ class GameUI {
         // Dark banner backdrop behind top bar
         const topBar = this.scene.add.graphics();
         topBar.fillStyle(0x0f172a, 0.65);
-        topBar.fillRoundedRect(10, 10, 520, 42, 8);
+        topBar.fillRoundedRect(10, 10, 720, 42, 8);
         this.container.add(topBar);
 
         this.objectiveText = this.scene.add.text(20, 58, '', {
@@ -32,7 +32,8 @@ class GameUI {
             fontSize: '9px',
             color: '#d1fae5',
             stroke: '#022c22',
-            strokeThickness: 2
+            strokeThickness: 2,
+            wordWrap: { width: 900 }
         });
         this.container.add(this.objectiveText);
 
@@ -75,6 +76,15 @@ class GameUI {
             this.muteBtn.setText(isMuted ? '[MUT]' : '[SND]');
         });
         this.container.add(this.muteBtn);
+
+        this.powerupText = this.scene.add.text(540, 22, '', {
+            fontFamily: '"Press Start 2P", monospace, sans-serif',
+            fontSize: '9px',
+            color: '#a5f3fc',
+            stroke: '#022c22',
+            strokeThickness: 2
+        });
+        this.container.add(this.powerupText);
     }
 
     setObjective(message, totalFireflies = 0) {
@@ -112,6 +122,19 @@ class GameUI {
             this.lastAnnouncedHealth = hp;
             this.announce(`${hp} ${hp === 1 ? 'heart' : 'hearts'} remaining`);
         }
+    }
+
+    updatePowerups(status = {}, hasSpitProjectile = false) {
+        if (!this.powerupText) return;
+        const labels = [];
+        if (status.shield) labels.push('SHIELD');
+        if (status.tongueSeconds > 0) labels.push(`LONG ${status.tongueSeconds}s`);
+        if (hasSpitProjectile) labels.push('SEED READY');
+        const next = labels.join('  ');
+        if (next === this.powerupText.text) return;
+        const previous = this.powerupText.text;
+        this.powerupText.setText(next);
+        if (!previous && next) this.announce(`Power-up active: ${next.toLowerCase()}`);
     }
 
     addScore(amount) {

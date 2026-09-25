@@ -6,69 +6,143 @@
       "type": "object",
       "required": ["x", "y"],
       "properties": { "x": { "type": "number" }, "y": { "type": "number" } },
-      "additionalProperties": true
+      "additionalProperties": false
     },
     "rect": {
       "type": "object",
       "required": ["x", "y", "w", "h"],
       "properties": { "x": { "type": "number" }, "y": { "type": "number" }, "w": { "type": "number", "exclusiveMinimum": 0 }, "h": { "type": "number", "exclusiveMinimum": 0 } },
-      "additionalProperties": true
+      "additionalProperties": false
     },
     "platform": {
-      "allOf": [{ "$ref": "#/$defs/rect" }, { "required": ["type"] }]
+      "type": "object",
+      "required": ["x", "y", "w", "h", "type"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "w": { "type": "number", "exclusiveMinimum": 0 },
+        "h": { "type": "number", "exclusiveMinimum": 0 },
+        "type": { "enum": ["ground", "grass"] }
+      },
+      "additionalProperties": false
     },
     "enemy": {
       "type": "object",
       "required": ["x", "y"],
       "properties": { "x": { "type": "number" }, "y": { "type": "number" } },
-      "additionalProperties": true
+      "additionalProperties": false
+    },
+    "patrollingEnemy": {
+      "type": "object",
+      "required": ["x", "y"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "patrol": { "type": "number", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "rangedEnemy": {
+      "type": "object",
+      "required": ["x", "y"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "range": { "type": "number", "exclusiveMinimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "powerup": {
+      "type": "object",
+      "required": ["x", "y", "type"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "type": { "enum": ["bubble_shield", "long_tongue"] }
+      },
+      "additionalProperties": false
+    },
+    "routeHint": {
+      "type": "object",
+      "required": ["x", "y", "text"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "text": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "boss": {
+      "type": "object",
+      "required": ["x", "y", "maxHp"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "maxHp": { "type": "integer", "minimum": 1 }
+      },
+      "additionalProperties": false
+    },
+    "arenaGate": {
+      "type": "object",
+      "required": ["x", "y", "triggerX"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "triggerX": { "type": "number" }
+      },
+      "additionalProperties": false
+    },
+    "arenaBounds": {
+      "type": "object",
+      "required": ["x", "y", "width", "height"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "width": { "type": "number", "exclusiveMinimum": 0 },
+        "height": { "type": "number", "exclusiveMinimum": 0 }
+      },
+      "additionalProperties": false
     }
   },
   "type": "array",
   "minItems": 5,
+  "maxItems": 5,
   "items": {
     "type": "object",
     "required": ["id", "name", "width", "height", "playerStart", "platforms", "goal"],
     "properties": {
       "id": { "type": "integer", "minimum": 1 },
       "name": { "type": "string", "minLength": 1 },
+      "objective": { "type": "string", "minLength": 1 },
+      "intro": { "type": "string", "minLength": 1 },
       "width": { "type": "number", "exclusiveMinimum": 0 },
       "height": { "type": "number", "exclusiveMinimum": 0 },
       "playerStart": { "$ref": "#/$defs/point" },
       "platforms": { "type": "array", "items": { "$ref": "#/$defs/platform" } },
       "goal": { "$ref": "#/$defs/point" },
-      "boss": { "$ref": "#/$defs/point" },
-      "arenaGate": { "$ref": "#/$defs/point" },
+      "boss": { "$ref": "#/$defs/boss" },
+      "arenaGate": { "$ref": "#/$defs/arenaGate" },
+      "arenaBounds": { "$ref": "#/$defs/arenaBounds" },
       "waterPits": { "type": "array", "items": { "$ref": "#/$defs/rect" } },
       "fireflies": { "type": "array", "items": { "$ref": "#/$defs/point" } },
       "goldenLotus": { "type": "array", "items": { "$ref": "#/$defs/point" } },
       "lilypads": { "type": "array", "items": { "$ref": "#/$defs/point" } },
       "mushrooms": { "type": "array", "items": { "$ref": "#/$defs/point" } },
-      "beetles": { "type": "array", "items": { "$ref": "#/$defs/enemy" } },
-      "mosquitoes": { "type": "array", "items": { "$ref": "#/$defs/enemy" } }
+      "beetles": { "type": "array", "items": { "$ref": "#/$defs/patrollingEnemy" } },
+      "mosquitoes": { "type": "array", "items": { "$ref": "#/$defs/rangedEnemy" } },
+      "powerups": { "type": "array", "items": { "$ref": "#/$defs/powerup" } },
+      "chargingBeetles": { "type": "array", "items": { "$ref": "#/$defs/patrollingEnemy" } },
+      "reedSpitters": { "type": "array", "items": { "$ref": "#/$defs/rangedEnemy" } },
+      "routeHints": { "type": "array", "items": { "$ref": "#/$defs/routeHint" } },
+      "cattails": { "type": "array", "items": { "$ref": "#/$defs/point" } },
+      "torches": { "type": "array", "items": { "$ref": "#/$defs/point" } },
+      "pillars": { "type": "array", "items": { "$ref": "#/$defs/point" } },
+      "skyKey": { "type": "string", "minLength": 1 },
+      "treesKey": { "type": "string", "minLength": 1 },
+      "grassKey": { "type": "string", "minLength": 1 },
+      "dirtKey": { "type": "string", "minLength": 1 },
+      "waterKey": { "type": "string", "minLength": 1 }
     },
-    "$defs": {
-      "point": {
-        "type": "object",
-        "required": ["x", "y"],
-        "properties": { "x": { "type": "number" }, "y": { "type": "number" } },
-        "additionalProperties": true
-      },
-      "rect": {
-        "type": "object",
-        "required": ["x", "y", "w", "h"],
-        "properties": { "x": { "type": "number" }, "y": { "type": "number" }, "w": { "type": "number", "exclusiveMinimum": 0 }, "h": { "type": "number", "exclusiveMinimum": 0 } },
-        "additionalProperties": true
-      },
-      "platform": {
-        "allOf": [{ "$ref": "#/$defs/rect" }, { "required": ["type"] }]
-      },
-      "enemy": {
-        "type": "object",
-        "required": ["x", "y"],
-        "properties": { "x": { "type": "number" }, "y": { "type": "number" } },
-        "additionalProperties": true
-      }
-    }
+    "additionalProperties": false
   }
 }

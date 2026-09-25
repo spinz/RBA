@@ -41,7 +41,8 @@ class FrogPlayer extends Phaser.Physics.Arcade.Sprite {
         this.tongueActive = false;
         this.tongueState = 'idle'; // 'extending', 'retracting', 'idle'
         this.tongueLength = 0;
-        this.maxTongueLength = window.RbaPhysics.tongueReach;
+        this.baseTongueLength = window.RbaPhysics.tongueReach;
+        this.maxTongueLength = this.baseTongueLength;
         this.tongueSpeed = window.RbaPhysics.tongueSpeed;
         this.tongueAngle = 0;
         this.caughtTarget = null;
@@ -62,7 +63,15 @@ class FrogPlayer extends Phaser.Physics.Arcade.Sprite {
         this.starTimer = 0;
         this.facing = 'right';
         this.isDead = false;
-        this.reducedFlashing = Boolean(window.StorageManager.load().profile.settings.reducedFlashing);
+        const settings = window.StorageManager.load().profile.settings;
+        this.reducedMotion = Boolean(settings.reducedMotion);
+        this.reducedFlashing = Boolean(settings.reducedFlashing);
+        this.bubbleShield = false;
+        this.longTongueExpiresAt = 0;
+        this.shieldGfx = null;
+        this.tonguePowerGfx = null;
+        this.invincibilityVersion = 0;
+        this.powerupPausedAt = null;
 
         // Yoshi-style Spitback mechanic
         this.hasSpitProjectile = false;
@@ -116,6 +125,9 @@ class FrogPlayer extends Phaser.Physics.Arcade.Sprite {
 
     update(time, delta, inputs) {
         if (this.isDead) return;
+
+        // Scene clock freezes while paused; the raw update clock does not.
+        this.updatePowerups(this.scene.time.now);
 
         const onGround = this.body.blocked.down || this.body.touching.down;
 
@@ -361,21 +373,21 @@ class FrogPlayer extends Phaser.Physics.Arcade.Sprite {
             this.tongueGfx.clear();
             if (this.tongueActive && this.tongueLength > 2) {
                 // Outer dark fleshy border
-                this.tongueGfx.lineStyle(5.5, 0x9f1239, 1);
+                this.tongueGfx.lineStyle(5.5, this.longTongueExpiresAt > this.scene.time.now ? 0x92400e : 0x9f1239, 1);
                 this.tongueGfx.beginPath();
                 this.tongueGfx.moveTo(mouthX, mouthY);
                 this.tongueGfx.lineTo(tipX, tipY);
                 this.tongueGfx.strokePath();
 
                 // Fleshy pink body
-                this.tongueGfx.lineStyle(3.5, 0xf43f5e, 1);
+                this.tongueGfx.lineStyle(3.5, this.longTongueExpiresAt > this.scene.time.now ? 0xfacc15 : 0xf43f5e, 1);
                 this.tongueGfx.beginPath();
                 this.tongueGfx.moveTo(mouthX, mouthY);
                 this.tongueGfx.lineTo(tipX, tipY);
                 this.tongueGfx.strokePath();
 
                 // Wet glistening specular top highlight
-                this.tongueGfx.lineStyle(1.5, 0xfecdd3, 0.95);
+                this.tongueGfx.lineStyle(1.5, this.longTongueExpiresAt > this.scene.time.now ? 0xfef9c3 : 0xfecdd3, 0.95);
                 this.tongueGfx.beginPath();
                 this.tongueGfx.moveTo(mouthX, mouthY - 1);
                 this.tongueGfx.lineTo(tipX, tipY - 1);
@@ -390,6 +402,8 @@ class FrogPlayer extends Phaser.Physics.Arcade.Sprite {
         if (!this.caughtTarget && this.tongueState === 'extending') {
             this.caughtTarget = obj;
             this.tongueState = 'retracting';
+            this.scene.tweens.killTweensOf(obj);
+            obj.onGrabbed?.(this);
             if (obj.body) obj.body.enable = false;
         }
     }
@@ -450,6 +464,14 @@ class FrogPlayer extends Phaser.Physics.Arcade.Sprite {
     takeDamage(amount = 1) {
         if (this.isInvincible || this.isDead || this.scene.isLevelCompleted || this.scene.bossDefeated) return;
 
+        if (this.bubbleShield) {
+            this.bubbleShield = false;
+            this.destroyShieldVisual();
+            this.setDamageGrace(700);
+            this.showShieldPop();
+            return;
+        }
+
         this.hp -= amount;
         if (this.scene.ui) {
             this.scene.ui.updateHealth(this.hp);
@@ -467,10 +489,143 @@ class FrogPlayer extends Phaser.Physics.Arcade.Sprite {
             this.body.setVelocityX(this.facing === 'right' ? -180 : 180);
 
             // Invincibility cooldown
-            this.isInvincible = true;
-            this.scene.time.delayedCall(1500, () => {
+            this.setDamageGrace(1500);
+        }
+    }
+
+    setDamageGrace(durationMs) {
+        const version = ++this.invincibilityVersion;
+        this.isInvincible = true;
+        this.scene.time.delayedCall(durationMs, () => {
+            if (this.active && !this.isDead && version === this.invincibilityVersion) {
                 this.isInvincible = false;
-            });
+            }
+        });
+    }
+
+    showShieldPop() {
+        const burst = this.scene.add.particles(this.x, this.y, 'sparkle', {
+            emitting: false,
+            speed: this.reducedMotion ? 25 : { min: 45, max: 110 },
+            tint: [0x67e8f9, 0xc4b5fd],
+            lifespan: 320,
+            quantity: this.reducedMotion ? 4 : 10
+        });
+        burst.explode(this.reducedMotion ? 4 : 10);
+        this.scene.time.delayedCall(350, () => burst.destroy());
+    }
+
+    giveBubbleShield() {
+        if (this.isDead) return;
+        this.bubbleShield = true;
+        if (!this.shieldGfx) {
+            this.shieldGfx = this.scene.add.graphics().setDepth(this.depth + 1);
+        }
+        this.drawShieldVisual(this.scene.time.now);
+    }
+
+    giveLongTongue(durationMs = 15000) {
+        if (this.isDead) return;
+        const duration = Math.max(0, Number(durationMs) || 0);
+        this.longTongueExpiresAt = this.getPowerupClock() + duration;
+        this.maxTongueLength = this.baseTongueLength * 1.5;
+        if (!this.tonguePowerGfx) {
+            this.tonguePowerGfx = this.scene.add.graphics().setDepth(this.depth);
+        }
+        this.drawTonguePowerVisual(this.getPowerupClock());
+    }
+
+    getPowerupClock() {
+        return this.powerupPausedAt ?? this.scene?.time?.now ?? 0;
+    }
+
+    setPowerupsPaused(paused) {
+        const now = this.scene?.time?.now ?? 0;
+        if (paused && this.powerupPausedAt === null) {
+            this.powerupPausedAt = now;
+        } else if (!paused && this.powerupPausedAt !== null) {
+            const pausedFor = Math.max(0, now - this.powerupPausedAt);
+            if (this.longTongueExpiresAt > 0) this.longTongueExpiresAt += pausedFor;
+            if (this.starPower) this.starTimer += pausedFor;
+            this.powerupPausedAt = null;
+        }
+    }
+
+    getPowerupStatus() {
+        const now = this.getPowerupClock();
+        this.expireLongTongue(now);
+        return {
+            shield: this.bubbleShield,
+            tongueSeconds: Math.max(0, Math.ceil((this.longTongueExpiresAt - now) / 1000))
+        };
+    }
+
+    updatePowerups(time) {
+        this.expireLongTongue(time);
+        if (this.bubbleShield) this.drawShieldVisual(time);
+        if (this.longTongueExpiresAt > time) this.drawTonguePowerVisual(time);
+    }
+
+    expireLongTongue(time) {
+        if (this.longTongueExpiresAt <= 0 || time < this.longTongueExpiresAt) return;
+        this.longTongueExpiresAt = 0;
+        this.powerupPausedAt = null;
+        this.maxTongueLength = this.baseTongueLength;
+        if (this.tongueState === 'extending' && this.tongueLength >= this.maxTongueLength) {
+            this.tongueState = 'retracting';
+        }
+        if (this.tonguePowerGfx) {
+            this.tonguePowerGfx.destroy();
+            this.tonguePowerGfx = null;
+        }
+    }
+
+    drawShieldVisual(time) {
+        if (!this.shieldGfx) return;
+        const animated = !this.reducedMotion && !this.reducedFlashing;
+        const pulse = animated ? Math.sin(time / 180) * 1.5 : 0;
+        this.shieldGfx.clear();
+        this.shieldGfx.fillStyle(0x67e8f9, 0.12);
+        this.shieldGfx.fillCircle(0, 0, 27 + pulse);
+        this.shieldGfx.lineStyle(3, 0xa5f3fc, 0.9);
+        this.shieldGfx.strokeCircle(0, 0, 27 + pulse);
+        this.shieldGfx.lineStyle(2, 0xffffff, 0.8);
+        this.shieldGfx.beginPath();
+        this.shieldGfx.arc(-6, -7, 13 + pulse * 0.3, 3.65, 4.75);
+        this.shieldGfx.strokePath();
+        this.shieldGfx.setPosition(this.x, this.y);
+    }
+
+    drawTonguePowerVisual(time) {
+        if (!this.tonguePowerGfx) return;
+        const animated = !this.reducedMotion && !this.reducedFlashing;
+        const lift = animated ? Math.sin(time / 220) * 1.5 : 0;
+        this.tonguePowerGfx.clear();
+        this.tonguePowerGfx.fillStyle(0xfacc15, 0.9);
+        this.tonguePowerGfx.fillCircle(-17, -13 + lift, 2.5);
+        this.tonguePowerGfx.fillCircle(18, -8 - lift, 2);
+        this.tonguePowerGfx.lineStyle(2, 0xfef08a, 0.75);
+        this.tonguePowerGfx.beginPath();
+        this.tonguePowerGfx.arc(0, 0, 25, 0.15, 1.15);
+        this.tonguePowerGfx.strokePath();
+        this.tonguePowerGfx.setPosition(this.x, this.y);
+    }
+
+    destroyShieldVisual() {
+        if (!this.shieldGfx) return;
+        this.shieldGfx.destroy();
+        this.shieldGfx = null;
+    }
+
+    clearTemporaryPowerups() {
+        this.bubbleShield = false;
+        this.longTongueExpiresAt = 0;
+        this.powerupPausedAt = null;
+        this.maxTongueLength = this.baseTongueLength;
+        this.destroyShieldVisual();
+        if (this.tonguePowerGfx) {
+            this.tonguePowerGfx.destroy();
+            this.tonguePowerGfx = null;
         }
     }
 
@@ -483,6 +638,9 @@ class FrogPlayer extends Phaser.Physics.Arcade.Sprite {
     die() {
         if (this.isDead) return;
         this.isDead = true;
+        this.invincibilityVersion++;
+        this.isInvincible = false;
+        this.clearTemporaryPowerups();
         this.body.enable = false;
         this.tongueActive = false;
         this.tongueTip.body.enable = false;
@@ -513,6 +671,7 @@ class FrogPlayer extends Phaser.Physics.Arcade.Sprite {
     }
 
     destroy() {
+        this.clearTemporaryPowerups();
         if (this.mouthGlow) this.scene?.tweens.killTweensOf(this.mouthGlow);
         if (this.mouthGlow) this.mouthGlow.destroy();
         if (this.shadow) this.shadow.destroy();

@@ -8,6 +8,29 @@
       "x": 90,
       "y": 430
     },
+    "objective": "Cross the lagoon and reach the firefly shrine.",
+    "intro": "Learn the leap, tongue, and bubble shield on calm water.",
+    "routeHints": [
+      {
+        "x": 380,
+        "y": 400,
+        "text": "A short hop reaches the shield before the first pest."
+      },
+      {
+        "x": 880,
+        "y": 180,
+        "text": "Optional high route: follow the bright fireflies."
+      }
+    ],
+    "powerups": [
+      {
+        "x": 430,
+        "y": 400,
+        "type": "bubble_shield"
+      }
+    ],
+    "chargingBeetles": [],
+    "reedSpitters": [],
     "platforms": [
       {
         "x": 0,
@@ -75,7 +98,7 @@
       {
         "x": 2320,
         "y": 480,
-        "w": 500,
+        "w": 480,
         "h": 120,
         "type": "ground"
       }
@@ -270,11 +293,6 @@
     ],
     "beetles": [
       {
-        "x": 260,
-        "y": 482,
-        "patrol": 100
-      },
-      {
         "x": 740,
         "y": 462,
         "patrol": 60
@@ -321,6 +339,35 @@
       "x": 90,
       "y": 480
     },
+    "objective": "Climb the canopy and read the charging beetle's warning.",
+    "intro": "Wide ledges give you room to learn charge timing.",
+    "routeHints": [
+      {
+        "x": 1360,
+        "y": 470,
+        "text": "Wait for the wind-up, then jump over the charge."
+      },
+      {
+        "x": 2320,
+        "y": 150,
+        "text": "Optional upper route: a long-tongue pickup waits ahead."
+      }
+    ],
+    "powerups": [
+      {
+        "x": 2460,
+        "y": 150,
+        "type": "long_tongue"
+      }
+    ],
+    "chargingBeetles": [
+      {
+        "x": 1500,
+        "y": 490,
+        "patrol": 110
+      }
+    ],
+    "reedSpitters": [],
     "platforms": [
       {
         "x": 0,
@@ -586,7 +633,7 @@
     ],
     "goldenLotus": [
       {
-        "x": 2460,
+        "x": 2540,
         "y": 130
       }
     ],
@@ -600,16 +647,6 @@
         "x": 500,
         "y": 452,
         "patrol": 40
-      },
-      {
-        "x": 1420,
-        "y": 502,
-        "patrol": 70
-      },
-      {
-        "x": 2500,
-        "y": 182,
-        "patrol": 60
       }
     ],
     "mosquitoes": [
@@ -653,6 +690,35 @@
       "x": 90,
       "y": 480
     },
+    "objective": "Use mushroom bounces and catch a reed spitter's shot.",
+    "intro": "The mire teaches projectile capture before the citadel.",
+    "routeHints": [
+      {
+        "x": 1280,
+        "y": 450,
+        "text": "Watch the reed's wind-up; your tongue can catch its shot."
+      },
+      {
+        "x": 2740,
+        "y": 430,
+        "text": "The final broad ledge combines charge timing with your bounce route."
+      }
+    ],
+    "powerups": [],
+    "chargingBeetles": [
+      {
+        "x": 2880,
+        "y": 450,
+        "patrol": 100
+      }
+    ],
+    "reedSpitters": [
+      {
+        "x": 1500,
+        "y": 460,
+        "range": 320
+      }
+    ],
     "platforms": [
       {
         "x": 0,
@@ -958,16 +1024,6 @@
         "x": 240,
         "y": 522,
         "patrol": 80
-      },
-      {
-        "x": 1380,
-        "y": 482,
-        "patrol": 70
-      },
-      {
-        "x": 2860,
-        "y": 462,
-        "patrol": 60
       }
     ],
     "mosquitoes": [
@@ -1016,6 +1072,40 @@
       "x": 90,
       "y": 500
     },
+    "objective": "Cross the ruins, enter the arena, and defeat King Croaker.",
+    "intro": "The citadel combines learned skills before the Croaker duel.",
+    "routeHints": [
+      {
+        "x": 600,
+        "y": 170,
+        "text": "Optional upper ruin: a shield rewards the mushroom ascent."
+      },
+      {
+        "x": 840,
+        "y": 410,
+        "text": "Catch the reed shot here; Croaker uses the same return lesson."
+      },
+      {
+        "x": 1360,
+        "y": 500,
+        "text": "The gate ahead begins King Croaker's arena."
+      }
+    ],
+    "powerups": [
+      {
+        "x": 770,
+        "y": 170,
+        "type": "bubble_shield"
+      }
+    ],
+    "chargingBeetles": [],
+    "reedSpitters": [
+      {
+        "x": 900,
+        "y": 420,
+        "range": 300
+      }
+    ],
     "arenaGate": {
       "x": 1440,
       "y": 480,
@@ -1327,11 +1417,6 @@
         "x": 200,
         "y": 542,
         "patrol": 60
-      },
-      {
-        "x": 890,
-        "y": 442,
-        "patrol": 50
       }
     ],
     "mosquitoes": [
@@ -1365,6 +1450,29 @@
       "x": 90,
       "y": 430
     },
+    "objective": "Carry Croaker's light home to the final firefly shrine.",
+    "intro": "King Croaker is beaten. Follow the fireflies home on a victory lap.",
+    "routeHints": [
+      {
+        "x": 760,
+        "y": 430,
+        "text": "Optional mastery arc: collect the high fireflies above the lilypads."
+      },
+      {
+        "x": 2490,
+        "y": 430,
+        "text": "The home shrine is ahead; no temporary power-up is required."
+      }
+    ],
+    "powerups": [
+      {
+        "x": 930,
+        "y": 468,
+        "type": "long_tongue"
+      }
+    ],
+    "chargingBeetles": [],
+    "reedSpitters": [],
     "platforms": [
       {
         "x": 0,

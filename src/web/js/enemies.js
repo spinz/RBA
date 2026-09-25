@@ -111,6 +111,12 @@ class MudBeetle extends Phaser.Physics.Arcade.Sprite {
         });
     }
 
+    takeSpitballDamage(projectile) {
+        if (this.isDefeated) return;
+        projectile?.destroy();
+        this.starDefeat();
+    }
+
     destroy() {
         if (this.shadow) this.shadow.destroy();
         super.destroy();
@@ -207,6 +213,12 @@ class HoverMosquito extends Phaser.Physics.Arcade.Sprite {
             ease: 'Cubic.easeOut',
             onComplete: () => this.destroy()
         });
+    }
+
+    takeSpitballDamage(projectile) {
+        if (this.isDefeated) return;
+        projectile?.destroy();
+        this.starDefeat();
     }
 }
 
@@ -386,7 +398,7 @@ class BossKingCroaker extends Phaser.Physics.Arcade.Sprite {
         }
 
         // Stun crown prompt
-        this.stompPrompt = scene.add.text(x, y - 52, '▼ WHIP TONGUE OR STOMP! ▼', {
+        this.stompPrompt = scene.add.text(x, y - 52, '▼ STUNNED: STOMP / TONGUE = 2 DAMAGE ▼', {
             fontFamily: '"Press Start 2P", monospace, sans-serif',
             fontSize: '10px',
             color: '#fde047',
@@ -394,12 +406,32 @@ class BossKingCroaker extends Phaser.Physics.Arcade.Sprite {
             strokeThickness: 3
         }).setOrigin(0.5).setVisible(false).setDepth(15);
 
+        // A steady, high-contrast label communicates attack type even when
+        // animation or flashing is reduced.
+        this.attackPrompt = scene.add.text(x, y - 70, '', {
+            fontFamily: '"Press Start 2P", monospace, sans-serif',
+            fontSize: '9px',
+            color: '#fef08a',
+            backgroundColor: '#1e1b4b',
+            padding: { x: 7, y: 5 },
+            stroke: '#000000',
+            strokeThickness: 2
+        }).setOrigin(0.5).setVisible(false).setDepth(16);
+
         // Tongue Sweep graphic
         this.bossTongueGfx = scene.add.graphics().setDepth(8);
         this.tongueSweepActive = false;
 
         this.initAnims();
         this.nextAttackTime = 0;
+    }
+
+    showAttackTell(message, color = '#fef08a') {
+        this.attackPrompt.setText(message).setColor(color).setVisible(true).setAlpha(1);
+    }
+
+    clearAttackTell() {
+        this.attackPrompt?.setVisible(false);
     }
 
     initAnims() {
@@ -477,6 +509,7 @@ class BossKingCroaker extends Phaser.Physics.Arcade.Sprite {
             this.shadow.setScale(scaleFactor, scaleFactor * 0.55);
             this.shadow.setAlpha(Math.max(0.15, 0.6 - heightAboveGround * 0.0015));
         }
+        this.attackPrompt.setPosition(this.x, this.y - 70);
 
         this.shockwaves.getChildren().forEach(shockwave => shockwave.update(time));
 
@@ -513,7 +546,9 @@ class BossKingCroaker extends Phaser.Physics.Arcade.Sprite {
         }
 
         // Enrage visual aura in Phase 2 & 3
-        if (this.hp <= 4 && this.state !== 'STUNNED' && this.state !== 'HURT') {
+        if (this.state === 'STUNNED') {
+            this.setTint(0xfde047);
+        } else if (this.hp <= 4 && this.state !== 'HURT') {
             this.setTint(this.hp <= 2 ? 0xff4444 : 0xff7777);
             if (Math.random() < 0.25) {
                 const steam = this.scene.add.image(this.x + Phaser.Math.Between(-20, 20), this.y - 10, 'dust')
@@ -585,12 +620,14 @@ class BossKingCroaker extends Phaser.Physics.Arcade.Sprite {
         this.state = 'WINDUP';
         this.play('boss_crouch');
         this.body.setVelocity(0, 0);
+        this.showAttackTell('LEAP SLAM: MOVE, THEN JUMP!', '#fef08a');
 
         window.soundEngine.playJump(true);
         this.emitDust(6);
 
         this.scene.time.delayedCall(this.hp <= 2 ? 350 : 550, () => {
             if (!this.active || this.state !== 'WINDUP') return;
+            this.clearAttackTell();
             this.state = 'JUMP_UP';
             this.play('boss_slam');
             this.body.setVelocityY(-720);
@@ -629,6 +666,7 @@ class BossKingCroaker extends Phaser.Physics.Arcade.Sprite {
     executeVenomSpit() {
         this.state = 'SPIT';
         this.play('boss_roar');
+        this.showAttackTell('VENOM: CATCH IT WITH YOUR TONGUE!', '#bef264');
         window.soundEngine.playBossRoar();
 
         const count = this.hp <= 2 ? 4 : (this.hp <= 4 ? 3 : 2);
@@ -654,6 +692,7 @@ class BossKingCroaker extends Phaser.Physics.Arcade.Sprite {
 
                 spawned++;
                 if (spawned >= count) {
+                    this.clearAttackTell();
                     this.scene.time.delayedCall(500, () => {
                         if (this.state === 'SPIT') {
                             this.state = 'IDLE';
@@ -670,26 +709,12 @@ class BossKingCroaker extends Phaser.Physics.Arcade.Sprite {
         this.state = 'TONGUE';
         this.play('boss_roar');
         window.soundEngine.playRibbit();
-
-        const warning = this.scene.add.text(this.x, this.y - 45, 'TONGUE SWEEP! JUMP HIGH!', {
-            fontFamily: '"Press Start 2P", monospace, sans-serif',
-            fontSize: '9px',
-            color: '#ef4444',
-            stroke: '#000000',
-            strokeThickness: 3
-        }).setOrigin(0.5);
-
-        this.scene.tweens.add({
-            targets: warning,
-            alpha: this.reducedFlashing ? 1 : 0.2,
-            yoyo: true,
-            repeat: 3,
-            duration: 150,
-            onComplete: () => warning.destroy()
-        });
+        this.showAttackTell('LOW TONGUE SWEEP: JUMP HIGH!', '#fca5a5');
 
         this.scene.time.delayedCall(700, () => {
             if (this.state !== 'TONGUE' || this.state === 'DEFEATED') return;
+
+            this.clearAttackTell();
 
             window.soundEngine.playTongue();
             this.tongueSweepActive = true;
@@ -917,6 +942,7 @@ class BossKingCroaker extends Phaser.Physics.Arcade.Sprite {
         if (this.shadow) this.shadow.destroy();
         this.stunStars.setVisible(false);
         this.stompPrompt.setVisible(false);
+        this.clearAttackTell();
         this.bossTongueGfx.clear();
 
         this.shockwaves.clear(true, true);
@@ -979,6 +1005,7 @@ class BossKingCroaker extends Phaser.Physics.Arcade.Sprite {
         if (this.shadow) this.shadow.destroy();
         if (this.stunStars) this.stunStars.destroy();
         if (this.stompPrompt) this.stompPrompt.destroy();
+        if (this.attackPrompt) this.attackPrompt.destroy();
         if (this.bossTongueGfx) this.bossTongueGfx.destroy();
         super.destroy();
     }

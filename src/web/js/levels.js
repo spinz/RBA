@@ -205,6 +205,24 @@ class LevelBuilder {
             });
         }
 
+        const powerupsGroup = scene.physics.add.group({ allowGravity: false, immovable: true });
+        for (const data of levelData.powerups || []) {
+            powerupsGroup.add(window.Powerups.create(scene, data));
+        }
+
+        const enemyProjectiles = scene.physics.add.group({ allowGravity: false });
+        const depthEnemies = scene.physics.add.group();
+        const chargingBeetles = (levelData.chargingBeetles || []).map(data => {
+            const enemy = new window.ChargingBeetle(scene, data.x, data.y, data.patrol);
+            depthEnemies.add(enemy);
+            return enemy;
+        });
+        const reedSpitters = (levelData.reedSpitters || []).map(data => {
+            const enemy = new window.ReedSpitter(scene, data.x, data.y, enemyProjectiles, data.range);
+            depthEnemies.add(enemy);
+            return enemy;
+        });
+
         return {
             platforms,
             lilypads,
@@ -216,7 +234,12 @@ class LevelBuilder {
             arenaGate,
             boss,
             beetles,
-            mosquitoes
+            mosquitoes,
+            powerupsGroup,
+            enemyProjectiles,
+            depthEnemies,
+            chargingBeetles,
+            reedSpitters
         };
     }
 }

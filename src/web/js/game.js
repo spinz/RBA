@@ -34,6 +34,8 @@ class BootScene extends Phaser.Scene {
     create() {
         // Generate all procedural pixel textures and backgrounds
         window.AssetGenerator.generateAll(this);
+        window.Powerups.generateTextures(this);
+        window.DepthEnemies.generateTextures(this);
 
         // Global firefly glow animation
         if (!this.anims.exists('firefly_glow')) {
@@ -380,7 +382,7 @@ class GameScene extends Phaser.Scene {
         this.ui.addScore(0);
         this.ui.setFireflies(this.carriedFireflies);
         this.ui.setObjective(
-            this.currentLevel.boss ? 'DEFEAT KING CROAKER' : 'REACH THE GOLDEN SHRINE',
+            this.currentLevel.objective || (this.currentLevel.boss ? 'DEFEAT KING CROAKER' : 'REACH THE GOLDEN SHRINE'),
             this.currentLevel.fireflies?.length || 0
         );
         this.ui.showLevelBanner(`LEVEL ${this.currentLevel.id}: ${this.currentLevel.name}`);
@@ -388,6 +390,7 @@ class GameScene extends Phaser.Scene {
 
         // 7. Setup Collisions & Triggers
         this.setupCollisions();
+        this.depthGameplay = new window.GameplayDepth(this);
 
         // 8. Setup Inputs
         this.setupInputs();
@@ -505,6 +508,7 @@ class GameScene extends Phaser.Scene {
         if (shouldPause === this.isPaused) return;
 
         this.isPaused = shouldPause;
+        this.player.setPowerupsPaused(shouldPause);
         if (shouldPause) {
             this.physics.world.pause();
             this.tweens.pauseAll();
@@ -520,6 +524,8 @@ class GameScene extends Phaser.Scene {
 
     setupCollisions() {
         const { platforms, lilypads, mushrooms, waterGroup, firefliesGroup, lotusGroup, goal, beetles, mosquitoes, boss, arenaGate } = this.levelElements;
+        // Returned seeds are a normal campaign ability, not boss-only plumbing.
+        this.spitballs = this.physics.add.group({ allowGravity: false });
 
         // Player vs Solid Platforms & Lilypads
         this.physics.add.collider(this.player, platforms);
@@ -668,7 +674,6 @@ class GameScene extends Phaser.Scene {
             });
 
             // Player Spat Projectiles vs Boss
-            this.spitballs = this.physics.add.group({ allowGravity: false });
             // Arcade normalizes sprite-vs-group callbacks to sprite first.
             this.physics.add.overlap(boss, this.spitballs, (b, sb) => b.takeSpitballDamage(sb));
 
@@ -919,6 +924,7 @@ class GameScene extends Phaser.Scene {
             jumpJustPressed: false, jumpReleased: false, tongueJustPressed: false
         } : inputs;
         this.player.update(time, delta, effectiveInputs);
+        this.depthGameplay.update(time, delta);
 
         // Update enemies
         this.levelElements.beetles.forEach(b => b.update());
