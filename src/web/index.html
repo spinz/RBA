@@ -369,12 +369,43 @@
         }
         .touch-controls button:nth-child(3) { margin-left: auto; background: #831843; }
         .touch-controls button:active { opacity: 1; }
+        .touch-pause {
+            position: absolute; top: 8px; right: 8px; z-index: 1001;
+            min-width: 48px; min-height: 48px; border-radius: 8px;
+            border: 2px solid #ffffff88; color: white; background: #064e3b;
+            font: bold 20px system-ui; touch-action: manipulation;
+        }
+        .touch-pause[hidden] { display: none; }
+        .scene-actions {
+            position: absolute; bottom: 12px; left: 12px; right: 12px;
+            z-index: 1001; display: flex; justify-content: center; gap: 12px;
+        }
+        .scene-actions button {
+            min-height: 48px; padding: 8px 16px; border: 2px solid #4ade80;
+            border-radius: 8px; color: white; background: #064e3b;
+            font: bold 16px system-ui; touch-action: manipulation;
+        }
+        .scene-actions--menu {
+            display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px; max-width: 480px; margin-inline: auto;
+        }
         @media (pointer: coarse) {
             .action-btn { min-width: 48px; min-height: 48px; }
+        }
+        @media (any-pointer: coarse) and (orientation: portrait) {
+            #game-wrapper {
+                height: calc((100vw - 20px) * 9 / 16 + 72px);
+                aspect-ratio: auto;
+            }
+            #game-canvas-container { height: calc(100% - 72px); }
         }
         @media (pointer: coarse) and (orientation: landscape) and (max-height: 650px) {
             #game-wrapper { max-height: calc(100dvh - 86px); }
         }
+        #game-wrapper:fullscreen {
+            width: 100vw; height: 100dvh; max-height: none; border-radius: 0;
+        }
+        #game-wrapper:fullscreen #game-canvas-container { height: 100%; }
     </style>
 </head>
 <body>

@@ -359,7 +359,7 @@ class GameUI {
 
     setPaused(isPaused) {
         this.resetTouch?.();
-        if (this.touchControls) this.touchControls.hidden = isPaused;
+        if (this.touchControls) this.touchControls.hidden = isPaused || !this.hasTouchInput;
         if (this.pauseContainer) this.pauseContainer.setVisible(isPaused);
         this.announce(isPaused ? 'Game paused' : 'Game resumed');
     }
@@ -379,40 +379,84 @@ class GameUI {
             tongueQueued: false
         };
 
-        const hasCoarsePointer = window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches;
-        const isNarrowTouchScreen = window.innerWidth <= 720 && navigator.maxTouchPoints > 0;
-        const isTouchDevice = hasCoarsePointer || isNarrowTouchScreen;
-        if (!isTouchDevice) return;
+        // Privacy browsers can mask capability hints. Real touch also reveals controls.
+        const isTouchDevice = window.__rbaTouchUsed || window.matchMedia('(any-pointer: coarse)').matches || navigator.maxTouchPoints > 0;
 
         const controls = document.createElement('div');
         controls.className = 'touch-controls';
         controls.style.setProperty('--touch-opacity', String(this.touchOpacity));
-        const buttons = [];
+        controls.hidden = !isTouchDevice;
+        const pointers = new Map();
         for (const [action, label] of [['left', 'Left'], ['right', 'Right'], ['tongue', 'Lash'], ['jump', 'Jump']]) {
             const button = document.createElement('button');
             button.textContent = label;
             button.setAttribute('aria-label', action === 'tongue' ? 'Tongue attack' : label);
-            const release = () => { this.touchInputs[action] = false; };
+            const held = new Set();
+            pointers.set(action, held);
+            const release = event => {
+                held.delete(event.pointerId);
+                this.touchInputs[action] = held.size > 0;
+            };
             button.addEventListener('pointerdown', event => {
+                if (this.scene.isPaused || this.scene.isLevelCompleted) return;
                 event.preventDefault();
-                button.setPointerCapture(event.pointerId);
+                event.stopPropagation();
+                try { button.setPointerCapture(event.pointerId); } catch { /* window release is the fallback */ }
+                held.add(event.pointerId);
                 this.touchInputs[action] = true;
                 if (action === 'jump' || action === 'tongue') this.touchInputs[`${action}Queued`] = true;
+                window.soundEngine.init();
             });
-            for (const event of ['pointerup', 'pointercancel', 'lostpointercapture', 'blur']) {
+            for (const event of ['pointerup', 'pointercancel', 'lostpointercapture']) {
                 button.addEventListener(event, release);
             }
+            // Do not send compatibility touches to Phaser's window listeners.
+            for (const event of ['touchstart', 'touchmove', 'touchend', 'touchcancel']) {
+                button.addEventListener(event, e => { e.preventDefault(); e.stopPropagation(); }, { passive: false });
+            }
             controls.append(button);
-            buttons.push(button);
         }
-        const reset = () => Object.keys(this.touchInputs).forEach(key => { this.touchInputs[key] = false; });
+        const reset = () => {
+            pointers.forEach(held => held.clear());
+            Object.keys(this.touchInputs).forEach(key => { this.touchInputs[key] = false; });
+        };
+        const releasePointer = event => {
+            pointers.forEach((held, action) => {
+                held.delete(event.pointerId);
+                this.touchInputs[action] = held.size > 0;
+            });
+        };
+        const reveal = event => {
+            if (event.pointerType !== 'touch') return;
+            window.__rbaTouchUsed = true;
+            this.hasTouchInput = true;
+            controls.hidden = this.scene.isPaused;
+            pause.hidden = false;
+        };
+        const pause = document.createElement('button');
+        pause.className = 'touch-pause';
+        pause.textContent = 'Ⅱ';
+        pause.setAttribute('aria-label', 'Pause or resume (touch)');
+        pause.hidden = !isTouchDevice;
+        for (const event of ['touchstart', 'touchend', 'touchcancel', 'mousedown', 'mouseup']) {
+            pause.addEventListener(event, e => e.stopPropagation());
+        }
+        pause.addEventListener('click', () => this.scene.togglePause());
+        this.hasTouchInput = isTouchDevice;
         this.resetTouch = reset;
         window.addEventListener('blur', reset);
-        document.getElementById('game-wrapper').append(controls);
+        window.addEventListener('pointerup', releasePointer);
+        window.addEventListener('pointercancel', releasePointer);
+        window.addEventListener('pointerdown', reveal, true);
+        document.getElementById('game-wrapper').append(controls, pause);
         this.touchControls = controls;
         this.scene.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
             window.removeEventListener('blur', reset);
+            window.removeEventListener('pointerup', releasePointer);
+            window.removeEventListener('pointercancel', releasePointer);
+            window.removeEventListener('pointerdown', reveal, true);
             controls.remove();
+            pause.remove();
         });
     }
 }

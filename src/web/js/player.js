@@ -280,12 +280,14 @@ class FrogPlayer extends Phaser.Physics.Arcade.Sprite {
 
     emitDust(qty = 3) {
         const emitter = this.scene.add.particles(this.x, this.y + 18, 'dust', {
+            emitting: false,
             speed: { min: 20, max: 65 },
             angle: { min: 200, max: 340 },
             scale: { start: 0.9, end: 0 },
             lifespan: 260,
             quantity: qty
         });
+        emitter.explode(qty);
         this.scene.time.delayedCall(300, () => emitter.destroy());
     }
 
@@ -395,10 +397,12 @@ class FrogPlayer extends Phaser.Physics.Arcade.Sprite {
     swallowTarget(obj) {
         if (!obj?.active) return;
         const p = this.scene.add.particles(this.x, this.y, 'sparkle', {
+            emitting: false,
             speed: { min: 50, max: 130 },
             lifespan: 380,
             quantity: 10
         });
+        p.explode(10);
         this.scene.time.delayedCall(400, () => p.destroy());
 
         if (obj.onSwallowed) {
@@ -426,6 +430,7 @@ class FrogPlayer extends Phaser.Physics.Arcade.Sprite {
     shootSpitProjectile() {
         this.hasSpitProjectile = false;
         if (this.mouthGlow) {
+            this.scene.tweens.killTweensOf(this.mouthGlow);
             this.mouthGlow.destroy();
             this.mouthGlow = null;
         }
@@ -443,7 +448,7 @@ class FrogPlayer extends Phaser.Physics.Arcade.Sprite {
     }
 
     takeDamage(amount = 1) {
-        if (this.isInvincible || this.isDead || this.scene.isLevelCompleted) return;
+        if (this.isInvincible || this.isDead || this.scene.isLevelCompleted || this.scene.bossDefeated) return;
 
         this.hp -= amount;
         if (this.scene.ui) {
@@ -508,6 +513,7 @@ class FrogPlayer extends Phaser.Physics.Arcade.Sprite {
     }
 
     destroy() {
+        if (this.mouthGlow) this.scene?.tweens.killTweensOf(this.mouthGlow);
         if (this.mouthGlow) this.mouthGlow.destroy();
         if (this.shadow) this.shadow.destroy();
         if (this.tongueGfx) this.tongueGfx.destroy();

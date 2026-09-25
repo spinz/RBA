@@ -1,5 +1,41 @@
 # Project review — September 24, 2026
 
+## September 25 follow-up: real collisions and Android input
+
+The earlier direct-damage tests missed a separate hard crash: Arcade normalizes
+sprite/group overlap callbacks to sprite-first, but the spitball callback treated
+the projectile as the boss (`takeSpitballDamage is not a function`). Reproduced
+with an actual fired projectile before fixing the argument order. Ordinary stomp
+checks also read `player.bottom`, which is undefined; they now use physics-body
+bounds. Browser regressions exercise actual tongue, stomp and projectile overlap,
+plus all six boss hit points through fired projectiles.
+
+Boss reward progression now runs on the scene timer independently of the death
+tween, keeps the lotus within view and automatically recovers it after two
+seconds. The next stage is named explicitly; victory/retry have CSS-sized action
+buttons, ignore repeated Space events, and no longer dismiss on arbitrary taps.
+
+Android Chromium emulation now starts using touch, combines three simultaneous
+contacts, releases individual contacts and cancels touches. Controls also respond
+when capability hints are masked or pointer capture is unavailable. Portrait
+controls have their own space below the canvas; touch menus have 48px targets,
+and fullscreen retains an in-game pause action. This is not a physical Pixel 8 /
+Brave verification, and the reported device-specific input failure has not been
+reproduced on hardware. The deployed HTML was checked against the previous build
+and was not stale when inspected.
+
+Combat/jump/collection particles are now single bursts instead of emitting their
+entire quantity every frame. Shockwave and loaded-projectile glow tweens are
+removed with their targets. These are bounded-allocation improvements, not a
+claim of measured frame-rate gains on the user's phone.
+
+Follow-up verification: 25 Chromium browser regressions (including rotation /
+fullscreen, finite effects, three-contact input, all three actual boss-hit paths,
+automatic boss-to-stage-5 progression and deliberate ending actions), production
+build, lint, formatting, configuration type checks, save/server/level smoke checks,
+and four Python auditor tests. Physical-device touch/audio playtesting remains a
+release limitation; a fully unassisted campaign playthrough is not claimed.
+
 ## Scope and confirmed findings
 
 Reviewed the canonical web scenes, player/combat, procedural audio, HUD/settings,

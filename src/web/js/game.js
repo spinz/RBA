@@ -7,6 +7,24 @@
  * - GameOverScene: Retry screen
  */
 
+// CSS-sized actions stay tappable when the canvas is scaled down on a phone.
+function createSceneActions(scene, actions, label = 'End screen actions') {
+    const panel = document.createElement('nav');
+    panel.className = 'scene-actions';
+    panel.setAttribute('aria-label', label);
+    for (const [label, action] of actions) {
+        const button = document.createElement('button');
+        button.textContent = label;
+        button.addEventListener('click', action);
+        button.addEventListener('keydown', event => event.stopPropagation());
+        button.addEventListener('keyup', event => event.stopPropagation());
+        panel.append(button);
+    }
+    document.getElementById('game-wrapper').append(panel);
+    scene.events.once(Phaser.Scenes.Events.SHUTDOWN, () => panel.remove());
+    return panel;
+}
+
 // --- 1. BOOT SCENE ---
 class BootScene extends Phaser.Scene {
     constructor() {
@@ -142,7 +160,10 @@ class TitleScene extends Phaser.Scene {
             }).setOrigin(0.5).setInteractive({ useHandCursor: true });
             item.on('pointerover', () => item.setColor('#ffffff'));
             item.on('pointerout', () => item.setColor('#fef08a'));
-            item.on('pointerdown', callback);
+            item.on('pointerdown', pointer => {
+                window.__rbaTouchUsed = Boolean(window.__rbaTouchUsed || pointer.wasTouch);
+                callback();
+            });
             this.menuItems.push({ item, callback });
         };
         addMenuItem('CONTINUE', 355, () => {
@@ -156,6 +177,13 @@ class TitleScene extends Phaser.Scene {
         });
         addMenuItem('STAGE MAP', 425, () => this.showStageMap());
         addMenuItem('SETTINGS', 460, () => this.showSettings());
+        const touchMenu = window.__rbaTouchUsed || window.matchMedia('(any-pointer: coarse)').matches || navigator.maxTouchPoints > 0;
+        if (touchMenu) {
+            this.menuItems.forEach(entry => entry.item.setVisible(false));
+            const labels = ['Continue', 'New adventure', 'Stage map', 'Settings'];
+            createSceneActions(this, this.menuItems.map((entry, i) => [labels[i], entry.callback]), 'Main menu')
+                .classList.add('scene-actions--menu');
+        }
         this.menuIndex = 0;
         this.updateMenuFocus();
         this.input.keyboard.on('keydown-UP', () => this.moveMenu(-1));
@@ -164,7 +192,7 @@ class TitleScene extends Phaser.Scene {
         this.input.keyboard.on('keydown-SPACE', () => { if (!this.menuDialog?.open) this.menuItems[this.menuIndex].callback(); });
         this.add.text(w / 2, h - 28, 'ARROWS/WASD: MOVE  |  SPACE: JUMP  |  X / SHIFT: TONGUE', {
             fontFamily: '"Press Start 2P", monospace, sans-serif', fontSize: '10px', color: '#a7f3d0'
-        }).setOrigin(0.5);
+        }).setOrigin(0.5).setVisible(!touchMenu);
     }
 
     moveMenu(delta) {
@@ -307,6 +335,7 @@ class GameScene extends Phaser.Scene {
         this.physics.world.resume();
         window.soundEngine.setPaused(false);
         this.victoryLotus = null;
+        this.bossDefeated = false;
         StorageManager.save({ completed: false, currentStage: this.levelIndex, score: this.stageStartScore,
             fireflies: this.stageStartFireflies, startOfStageScore: this.stageStartScore,
             startOfStageFireflies: this.stageStartFireflies });
@@ -526,11 +555,13 @@ class GameScene extends Phaser.Scene {
         this.physics.add.overlap(this.player, waterGroup, (player, water) => {
             if (player.y > water.y - 6) {
                 const splash = this.add.particles(player.x, water.y, 'water_drop', {
+                    emitting: false,
                     speed: { min: 40, max: 120 },
                     angle: { min: 220, max: 320 },
                     lifespan: 300,
                     quantity: 6
                 });
+                splash.explode(6);
                 this.time.delayedCall(350, () => splash.destroy());
                 player.takeDamage(1);
                 player.body.setVelocityY(-350);
@@ -571,7 +602,7 @@ class GameScene extends Phaser.Scene {
 
                 if (player.starPower) {
                     b.starDefeat();
-                } else if (player.body.velocity.y > 0 && player.bottom <= b.y + 12) {
+                } else if (player.body.velocity.y > 0 && player.body.bottom <= b.body.top + 16) {
                     b.squash(player);
                 } else {
                     player.takeDamage(1);
@@ -594,7 +625,7 @@ class GameScene extends Phaser.Scene {
 
                 if (player.starPower) {
                     m.starDefeat();
-                } else if (player.body.velocity.y > 0 && player.bottom <= m.y + 8) {
+                } else if (player.body.velocity.y > 0 && player.body.bottom <= m.body.top + 16) {
                     m.squash(player);
                 } else {
                     player.takeDamage(1);
@@ -619,7 +650,7 @@ class GameScene extends Phaser.Scene {
                 if (b.state === 'DEFEATED' || b.state === 'WAITING') return;
 
                 const isFalling = player.body.velocity.y > 0;
-                const isAboveCrown = player.bottom <= b.y + 16;
+                const isAboveCrown = player.body.bottom <= b.body.top + 20;
 
                 if (player.starPower) {
                     b.takeStompDamage(player);
@@ -638,7 +669,8 @@ class GameScene extends Phaser.Scene {
 
             // Player Spat Projectiles vs Boss
             this.spitballs = this.physics.add.group({ allowGravity: false });
-            this.physics.add.overlap(this.spitballs, boss, (sb, b) => b.takeSpitballDamage(sb));
+            // Arcade normalizes sprite-vs-group callbacks to sprite first.
+            this.physics.add.overlap(boss, this.spitballs, (b, sb) => b.takeSpitballDamage(sb));
 
             // Player vs Shockwaves
             this.physics.add.overlap(this.player, boss.shockwaves, (player, sw) => {
@@ -724,10 +756,14 @@ class GameScene extends Phaser.Scene {
 
     spawnVictoryLotus(x, y) {
         if (this.victoryLotus || this.isLevelCompleted) return;
+        // Keep the reward in view, even for a distant projectile kill.
+        const camera = this.cameras.main;
+        x = Phaser.Math.Clamp(x, camera.scrollX + 100, camera.scrollX + camera.width - 100);
+        y = Phaser.Math.Clamp(y, camera.scrollY + 150, camera.scrollY + camera.height - 70);
         const lotus = this.physics.add.sprite(x, y, 'golden_lotus').setDepth(15).setScale(1.6);
         this.victoryLotus = lotus;
         lotus.body.setAllowGravity(false);
-        this.ui.updateObjective('CLAIM THE GOLDEN LOTUS');
+        this.ui.updateObjective('CROAKER DEFEATED — NEXT: FIREFLY MARSH');
 
         // Halo sparkles
         if (!this.ui.reducedMotion) this.tweens.add({
@@ -739,7 +775,7 @@ class GameScene extends Phaser.Scene {
             ease: 'Sine.easeInOut'
         });
 
-        const prompt = this.add.text(x, y - 40, 'CLAIM THE GOLDEN LOTUS!', {
+        const prompt = this.add.text(x, y - 40, 'GOLDEN LOTUS RECOVERED!', {
             fontFamily: '"Press Start 2P", monospace, sans-serif',
             fontSize: '11px',
             color: '#fef08a',
@@ -765,6 +801,8 @@ class GameScene extends Phaser.Scene {
         this.physics.add.overlap(this.player, lotus, claim);
         this.physics.add.overlap(this.player.tongueTip, lotus, claim,
             () => this.player.tongueActive && !this.player.isDead);
+        // Progression must not depend on finding a small collectible after combat.
+        this.time.delayedCall(2000, claim);
     }
 
     completeLevel() {
@@ -779,7 +817,8 @@ class GameScene extends Phaser.Scene {
         window.soundEngine.stopMusic();
         window.soundEngine.playWin();
 
-        this.ui.showLevelBanner('STAGE CLEAR!');
+        const nextName = window.LevelBuilder.getLevels()[this.levelIndex + 1]?.name;
+        this.ui.showLevelBanner(nextName ? `STAGE CLEAR!\nNEXT: ${nextName}` : 'ADVENTURE COMPLETE!');
 
         // Sparkle fireworks celebration
         const winParticles = this.add.particles(this.player.x, this.player.y - 20, 'sparkle', {
@@ -914,7 +953,7 @@ class VictoryScene extends Phaser.Scene {
         const w = this.scale.width;
         const h = this.scale.height;
 
-        this.add.tileSprite(0, 0, w, h, 'bg_sky').setOrigin(0, 0);
+        this.add.image(0, 0, 'bg_sky').setOrigin(0, 0).setDisplaySize(w, h);
 
         this.add.text(w / 2, 70, 'CONGRATULATIONS!', {
             fontFamily: '"Press Start 2P", monospace, sans-serif',
@@ -979,26 +1018,19 @@ class VictoryScene extends Phaser.Scene {
             color: '#fef08a'
         }).setOrigin(0.5);
 
-        const restartBtn = this.add.text(w / 2, 400, 'PRESS SPACE TO PLAY AGAIN', {
+        this.add.text(w / 2, 385, 'THE SWAMPS ARE SAFE. THANKS FOR PLAYING!', {
             fontFamily: '"Press Start 2P", monospace, sans-serif',
             fontSize: '14px',
             color: '#6ee7b7'
         }).setOrigin(0.5);
 
-        if (!StorageManager.load().profile.settings.reducedMotion) this.tweens.add({
-            targets: restartBtn,
-            alpha: 0.3,
-            duration: 600,
-            yoyo: true,
-            repeat: -1
-        });
-
         const replay = () => {
             StorageManager.newRun();
             this.scene.start('GameScene', { levelIndex: 0, score: 0, fireflies: 0 });
         };
-        this.input.keyboard.once('keydown-SPACE', replay);
-        this.input.once('pointerdown', replay);
+        // A held jump key or an incidental tap must not dismiss the ending.
+        this.input.keyboard.on('keydown-SPACE', event => { if (!event.repeat) replay(); });
+        createSceneActions(this, [['Play again', replay], ['Main menu', () => this.scene.start('TitleScene')]]);
     }
 }
 
@@ -1021,7 +1053,7 @@ class GameOverScene extends Phaser.Scene {
 
         this.cameras.main.setBackgroundColor('#09090b');
         window.soundEngine.setTrack('gameover');
-        window.announceGame?.('Game over. Press Space or tap to retry the stage.');
+        window.announceGame?.('Game over. Choose Retry stage or press Space.');
 
         this.add.text(w / 2, 125, 'GAME OVER', {
             fontFamily: '"Press Start 2P", monospace, sans-serif',
@@ -1050,19 +1082,11 @@ class GameOverScene extends Phaser.Scene {
             color: isNewHigh ? '#fde047' : '#64748b'
         }).setOrigin(0.5);
 
-        const prompt = this.add.text(w / 2, 350, 'PRESS SPACE OR TAP TO RETRY', {
+        this.add.text(w / 2, 350, 'YOUR STAGE CHECKPOINT IS SAFE', {
             fontFamily: '"Press Start 2P", monospace, sans-serif',
             fontSize: '14px',
             color: '#fef08a'
         }).setOrigin(0.5);
-
-        if (!StorageManager.load().profile.settings.reducedMotion) this.tweens.add({
-            targets: prompt,
-            alpha: 0.3,
-            duration: 600,
-            yoyo: true,
-            repeat: -1
-        });
 
         const retry = () => {
             this.scene.start('GameScene', {
@@ -1072,8 +1096,8 @@ class GameOverScene extends Phaser.Scene {
             });
         };
 
-        this.input.keyboard.once('keydown-SPACE', retry);
-        this.input.once('pointerdown', retry);
+        this.input.keyboard.on('keydown-SPACE', event => { if (!event.repeat) retry(); });
+        createSceneActions(this, [['Retry stage', retry], ['Main menu', () => this.scene.start('TitleScene')]]);
     }
 }
 

@@ -245,6 +245,11 @@ class BossShockwave extends Phaser.Physics.Arcade.Sprite {
             this.destroy();
         }
     }
+
+    destroy() {
+        this.scene?.tweens.killTweensOf(this);
+        super.destroy();
+    }
 }
 
 class BossVenomBall extends Phaser.Physics.Arcade.Sprite {
@@ -786,11 +791,13 @@ class BossKingCroaker extends Phaser.Physics.Arcade.Sprite {
         this.scene.ui.updateBossHealth(this.hp);
 
         const burst = this.scene.add.particles(this.x, this.y - 15, 'sparkle', {
+            emitting: false,
             speed: { min: 80, max: isCritical ? 240 : 180 },
             scale: { start: isCritical ? 2.2 : 1.6, end: 0 },
             lifespan: 450,
             quantity: isCritical ? 35 : 20
         });
+        burst.explode(this.scene.ui.reducedMotion ? 6 : (isCritical ? 35 : 20));
         this.scene.time.delayedCall(500, () => burst.destroy());
 
         if (this.hp <= 0) {
@@ -825,11 +832,13 @@ class BossKingCroaker extends Phaser.Physics.Arcade.Sprite {
         this.scene.ui.updateBossHealth(this.hp);
 
         const boom = this.scene.add.particles(this.x, this.y - 15, 'sparkle', {
+            emitting: false,
             speed: { min: 100, max: 260 },
             scale: { start: 2.0, end: 0 },
             lifespan: 550,
             quantity: 30
         });
+        boom.explode(this.scene.ui.reducedMotion ? 6 : 30);
         this.scene.time.delayedCall(600, () => boom.destroy());
 
         if (this.hp <= 0) {
@@ -872,11 +881,13 @@ class BossKingCroaker extends Phaser.Physics.Arcade.Sprite {
         this.scene.ui.updateBossHealth(this.hp);
 
         const burst = this.scene.add.particles(this.x, this.y - 24, 'sparkle', {
+            emitting: false,
             speed: { min: 80, max: 220 },
             scale: { start: isCritical ? 2.2 : 1.8, end: 0 },
             lifespan: 500,
             quantity: isCritical ? 35 : 25
         });
+        burst.explode(this.scene.ui.reducedMotion ? 6 : (isCritical ? 35 : 25));
         this.scene.time.delayedCall(500, () => burst.destroy());
 
         if (this.hp <= 0) {
@@ -910,6 +921,8 @@ class BossKingCroaker extends Phaser.Physics.Arcade.Sprite {
 
         this.shockwaves.clear(true, true);
         this.venomBalls.clear(true, true);
+        // The encounter is won; no late hazard may steal the reward sequence.
+        scene.bossDefeated = true;
 
         window.soundEngine.setTrack('reward');
         window.soundEngine.playWin();
@@ -941,21 +954,24 @@ class BossKingCroaker extends Phaser.Physics.Arcade.Sprite {
             scaleY: 0,
             duration: scene.ui.reducedMotion ? 300 : 1600,
             ease: 'Cubic.easeIn',
-            onComplete: () => {
-                this.destroy();
-                if (scene.sys.isActive()) scene.spawnVictoryLotus(rewardX, rewardY);
-            }
+            onComplete: () => this.destroy()
+        });
+        // Progression belongs to the scene, not to a disposable visual effect.
+        scene.time.delayedCall(scene.ui.reducedMotion ? 300 : 1600, () => {
+            if (scene.sys.isActive()) scene.spawnVictoryLotus(rewardX, rewardY);
         });
     }
 
     emitDust(qty = 8) {
         const emitter = this.scene.add.particles(this.x, this.arenaFloorY + 8, 'dust', {
+            emitting: false,
             speed: { min: 40, max: 120 },
             angle: { min: 180, max: 360 },
             scale: { start: 1.4, end: 0 },
             lifespan: 400,
             quantity: qty
         });
+        emitter.explode(this.scene.ui.reducedMotion ? 2 : qty);
         this.scene.time.delayedCall(450, () => emitter.destroy());
     }
 
